@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  slims:
+    build: .
+    hostname: slims
+    command: ["python", "/usr/src/app/slims/manage.py", "runserver", "0.0.0.0:9876"]
+    # command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - .:/usr/src/app 
+      - data_volume:/data
+    environment:
+      - VERSION=DOCKER
+      - DEBUG=1
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - ./.env.dev
+    networks:
+      - slims-network
+    ports:
+      - "9876:9876"
+    depends_on:
+      - db
+  db:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=slims
+      - MYSQL_USER=slims
+      - MYSQL_PASSWORD=slims
+      - MYSQL_ROOT_PASSWORD=admin
+      # - MYSQL_HOST=''
+    volumes:
+      - mysqld:/var/run/mysqld
+      - db:/var/lib/mysql
+    networks:
+      - slims-network
+volumes:
+  mysqld:
+  db:
+  data_volume:
+networks:
+  slims-network:
