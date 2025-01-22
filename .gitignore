@@ -1,0 +1,4 @@
+*.pyc
+oldapp
+config.py
+.env.dev
