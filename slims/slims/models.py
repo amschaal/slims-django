@@ -174,7 +174,8 @@ class Run(models.Model):
     request_transfer = models.IntegerField(blank=True, null=True)
     last_transfer = models.DateTimeField(blank=True, null=True)
     run_type = models.CharField(max_length=15, blank=True, null=True)
-
+    def ordered_lanes(self):
+        return self.lanes.all().order_by('lane_number')
     class Meta:
         managed = False
         db_table = 'run'
@@ -195,7 +196,7 @@ class RunEmail(models.Model):
 
 class RunLane(models.Model):
     run_lane_id = models.AutoField(primary_key=True)
-    run = models.ForeignKey(Run, models.DO_NOTHING)
+    run = models.ForeignKey(Run, models.DO_NOTHING, related_name='lanes')
     lane_number = models.CharField(max_length=2, blank=True, null=True)
     group = models.ForeignKey(DbGroup, models.DO_NOTHING)
     organism = models.ForeignKey(Organism, models.DO_NOTHING, blank=True, null=True)
@@ -209,7 +210,9 @@ class RunLane(models.Model):
     lane_dir = models.CharField(max_length=40, blank=True, null=True)
     job_id = models.CharField(max_length=50, blank=True, null=True)
     project_id = models.CharField(max_length=50, blank=True, null=True)
-
+    @property
+    def data_url(self):
+        return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
     class Meta:
         managed = False
         db_table = 'run_lane'
