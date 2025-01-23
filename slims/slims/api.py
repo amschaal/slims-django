@@ -11,8 +11,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class RunSerializer(serializers.ModelSerializer):
     class Meta:
-        ordering_fields = ['run_date', 'machine', 'submitted', 'run_type']
-        ordering = ['username']
         model = Run
         exclude = []
 
@@ -24,6 +22,9 @@ class UserViewSet(viewsets.ModelViewSet):
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
+    ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'num_cycles', 'run_dir']
+    ordering = ['run_date']
+    search_fields = ['run_date', 'machine', 'submitted', 'run_type', 'description']
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
