@@ -6,7 +6,12 @@
 </h1>
 <form method="POST" action=".">
     {% csrf_token %}
-    {{ form|crispy }}
+    {{ run_form|crispy }}
+    <h3>Lanes</h3>
+    {{ lane_formset.management_form }}
+    {% for lane in lane_formset %}
+        {{ lane|crispy }}
+    {% endfor %}
     <input class="button" type="submit" value="Submit" />
 </form>
 
