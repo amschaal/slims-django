@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'slims',
     'rest_framework',
-    'django_filters'
+    'django_filters',
+    'crispy_forms',
+    'crispy_bulma',
 ]
 
 MIDDLEWARE = [
@@ -131,5 +133,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 'rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter']
 }
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
+CRISPY_TEMPLATE_PACK = 'bulma'
 
 from .config import *

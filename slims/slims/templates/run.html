@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block 'content' %}
 <h1 class="title">
-    View Run
+    View Run <a href="{% url 'edit_run' pk=run.pk %}" class="button">Edit</a>
 </h1>
 <h2>General Data</h2>
 <table class="table">

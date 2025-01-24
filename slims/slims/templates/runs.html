@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block 'content' %}
-    <h1 class="title">
-        Runs
-      </h1>
+<h1 class="title">
+    Runs
+</h1>
 <table id="runs" class="table is-striped" style="width:100%">
     <thead>
         <tr>
@@ -16,77 +16,75 @@
     </thead>
     <tbody></tbody>
 </table>
-{% for run in runs %}
-{{ run }}
-{% endfor %}
 <script>
-$(document).ready(function() {
-    console.log('Document ready, initializing DataTable...');
-    $('#runs').DataTable({
-        columns: [
-            { data: "submitted",
-              render: function (data, type, row) {
-                console.log('data', data, type, row)
-                return '<a href="/runs/'+row.run_id+'/">'+row.submitted+'</a>'
-              }
-            },
-            { data: "run_date"},
-            { data: "machine" },
-            { data: "run_dir" },
-            { data: "num_cycles" },
-            { data: "description" },
-            {
-                data: null,
-                render: function (data, type, row) {
-                    return '<a class="button" href="/runs/'+row.run_id+'/">view</a>'
+    $(document).ready(function () {
+        console.log('Document ready, initializing DataTable...');
+        $('#runs').DataTable({
+            columns: [
+                {
+                    data: "submitted",
+                    render: function (data, type, row) {
+                        console.log('data', data, type, row)
+                        return '<a href="/runs/' + row.run_id + '/">' + row.submitted + '</a>'
+                    }
+                },
+                { data: "run_date" },
+                { data: "machine" },
+                { data: "run_dir" },
+                { data: "num_cycles" },
+                { data: "description" },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<a class="button" href="/runs/' + row.run_id + '/">view</a>'
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<a class="button" href="/runs/' + row.run_id + '/edit/">edit</a>'
+                    }
                 }
-            },
-            {
-                data: null,
-                render: function (data, type, row) {
-                    return '<a class="button" href="/runs/'+row.run_id+'/modify/">modify</a>'
-                }
-            }
-        ],
-        processing: true,
-        serverSide: true,
-        ajax: {
-           "url": "/api/runs/", // Django REST API URL
-           "data": function(d) {
-                console.log('Requesting data with parameters:', d);
-                d.limit = d.length; // Page size
-                d.offset = d.start; // Starting point of the current page
-                if (d.order && d.order.length > 0) {
-                    // `order[0][column]` gives us the column index, and `order[0][dir]` gives the direction
-                    var columnIndex = d.order[0].column;
-                    var columnName = $('#runs').DataTable().settings()[0].aoColumns[columnIndex].data;
-                    d.ordering = (d.order[0].dir === 'asc' ? '' : '-') + columnName; // DRF ordering syntax
-                }
+            ],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                "url": "/api/runs/", // Django REST API URL
+                "data": function (d) {
+                    console.log('Requesting data with parameters:', d);
+                    d.limit = d.length; // Page size
+                    d.offset = d.start; // Starting point of the current page
+                    if (d.order && d.order.length > 0) {
+                        // `order[0][column]` gives us the column index, and `order[0][dir]` gives the direction
+                        var columnIndex = d.order[0].column;
+                        var columnName = $('#runs').DataTable().settings()[0].aoColumns[columnIndex].data;
+                        d.ordering = (d.order[0].dir === 'asc' ? '' : '-') + columnName; // DRF ordering syntax
+                    }
 
-                // Sending the search term if provided
-                if (d.search && d.search.value) {
-                    d.search = d.search.value;  // Pass search term directly to the API
+                    // Sending the search term if provided
+                    if (d.search && d.search.value) {
+                        d.search = d.search.value;  // Pass search term directly to the API
+                    }
+                },
+                "dataSrc": {
+                    recordsTotal: 'count',
+                    recordsFiltered: 'count',
+                    data: 'results'
                 }
+                // function(json) {
+                //     return {
+                //         // draw: json.draw,  // The draw parameter that DataTables sends back
+                //         recordsTotal: json.count,  // Total number of records (before filtering)
+                //         recordsFiltered: json.count,  // Total after filtering (you can adjust this if needed)
+                //         data: json.results || []  // Actual data for the current page
+                //     };
+                //     // console.log('Received data:', json);  // Log the response for debugging
+                //     // return json.results || [];
+                // } 
             },
-            "dataSrc": {
-                recordsTotal: 'count',
-                recordsFiltered: 'count',
-                data: 'results'
-            }
-            // function(json) {
-            //     return {
-            //         // draw: json.draw,  // The draw parameter that DataTables sends back
-            //         recordsTotal: json.count,  // Total number of records (before filtering)
-            //         recordsFiltered: json.count,  // Total after filtering (you can adjust this if needed)
-            //         data: json.results || []  // Actual data for the current page
-            //     };
-            //     // console.log('Received data:', json);  // Log the response for debugging
-            //     // return json.results || [];
-            // } 
-        },
-        "lengthMenu": [10, 25, 50], // Options for page sizes
-        "pageLength": 10, // Default page size
+            "lengthMenu": [10, 25, 50], // Options for page sizes
+            "pageLength": 10, // Default page size
+        });
     });
-});
 </script>
 {% endblock %}
