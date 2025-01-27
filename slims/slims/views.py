@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .models import Run
-from .forms import RunForm, LaneFormSet
+from .forms import RunForm, LaneFormSet, RunLaneHelper
 
 
 def runs(request):
@@ -25,6 +25,7 @@ def edit_run_old(request, pk):
 
 
 def edit_run(request, pk=None):
+    helper = RunLaneHelper()
     if pk:
         run = Run.objects.get(pk=pk)
         run_form = RunForm(request.POST or None, instance=run)
@@ -38,4 +39,4 @@ def edit_run(request, pk=None):
         lane_formset.save()
         return redirect('run', pk=instance.pk)
     
-    return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset})
+    return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})

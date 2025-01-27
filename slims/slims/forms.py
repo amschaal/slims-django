@@ -1,10 +1,26 @@
 from django import forms
 from slims.models import Run, RunLane
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field, Row, Div
 
 class RunForm(forms.ModelForm):
     class Meta:
         model = Run
         fields = ["run_date", "run_dir", "description", "notes"]
+
+class RunLaneHelper(FormHelper):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.form_horizontal = True
+        self.layout = Layout(
+            Div(
+                Div('group', css_class='column is-2'), 
+                Div('project_id', css_class='column is-3'),
+                Div('concentration', css_class='column is-1'),
+                Div('description', css_class='column is-6'),
+                css_class='columns is-multiline'
+            )
+        )
 
 class RunLaneForm(forms.ModelForm):
     class Meta:
@@ -26,7 +42,7 @@ class RunWithLanesForm(forms.Form):
         if commit:
             run.save()
 
-        # Save the related Book instances
+        # Save the related Lane instances
         lanes = self.cleaned_data['lanes']
         for lane in lanes:
             if lane.cleaned_data:
