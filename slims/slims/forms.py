@@ -8,21 +8,24 @@ class RunForm(forms.ModelForm):
         model = Run
         fields = ["run_date", "run_dir", "description", "notes"]
 
+# Following helper is not working for some reason.
 class RunLaneHelper(FormHelper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.form_horizontal = True
+        # self.form_horizontal = True
+        self.form_tag = False
         self.layout = Layout(
-            Div(
-                Div('group', css_class='column is-2'), 
-                Div('project_id', css_class='column is-3'),
-                Div('concentration', css_class='column is-1'),
-                Div('description', css_class='column is-6'),
-                css_class='columns is-multiline'
-            )
+            Div('group', css_class='column is-2'), 
+            Div('project_id', css_class='column is-3'),
+            Div('concentration', css_class='column is-2'),
+            Div('description', css_class='column is-5'),
         )
 
 class RunLaneForm(forms.ModelForm):
+    # lane_number = forms.HiddenInput()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs['rows']=2
     class Meta:
         model = RunLane
         fields = ["group", "project_id", "concentration", "description"]
