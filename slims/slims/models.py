@@ -3,10 +3,13 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `managed = True` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
 
+#  Must first run: python manage.py migrate slims --fake-initial
+#  Then run: python manage.py migrate slims
+from django.db import models
+from django.contrib.auth.models import Group, User
 
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)
@@ -20,7 +23,7 @@ class Address(models.Model):
     organization = models.CharField(max_length=250, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'address'
 
 
@@ -30,7 +33,7 @@ class BioshareShare(models.Model):
     project_id = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'bioshare_share'
         unique_together = (('run', 'project_id'),)
 
@@ -47,7 +50,7 @@ class ConfigFile(models.Model):
     status = models.CharField(max_length=8, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'config_file'
 
 
@@ -63,7 +66,7 @@ class ConfigFileRun(models.Model):
     status = models.CharField(max_length=8, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'config_file_run'
 
 
@@ -74,7 +77,7 @@ class Confirmation(models.Model):
     confirmed = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'confirmation'
 
 
@@ -85,7 +88,7 @@ class DbGroup(models.Model):
     bioshare_group_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'db_group'
 
 
@@ -95,7 +98,7 @@ class MaqgeneLanes(models.Model):
     run_lane_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'maqgene_lanes'
 
 
@@ -107,7 +110,7 @@ class Organism(models.Model):
     genome_dir = models.CharField(db_column='GENOME_DIR', max_length=250, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'organism'
 
 
@@ -116,7 +119,7 @@ class Permission(models.Model):
     permission = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'permission'
 
 
@@ -127,7 +130,7 @@ class Phone(models.Model):
     type = models.CharField(max_length=9, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'phone'
 
 
@@ -137,7 +140,7 @@ class Pwdrecover(models.Model):
     recoverid = models.CharField(db_column='recoverID', max_length=32)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'pwdrecover'
 
 
@@ -146,7 +149,7 @@ class Role(models.Model):
     role = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'role'
 
 
@@ -156,7 +159,7 @@ class RolePermission(models.Model):
     permission = models.ForeignKey(Permission, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'role_permission'
         unique_together = (('role', 'permission'),)
 
@@ -177,7 +180,7 @@ class Run(models.Model):
     def ordered_lanes(self):
         return self.lanes.all().order_by('lane_number')
     class Meta:
-        managed = False
+        managed = True
         db_table = 'run'
 
 
@@ -190,7 +193,7 @@ class RunEmail(models.Model):
     sent_at = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'run_email'
 
 
@@ -198,7 +201,8 @@ class RunLane(models.Model):
     run_lane_id = models.AutoField(primary_key=True)
     run = models.ForeignKey(Run, models.DO_NOTHING, related_name='lanes')
     lane_number = models.CharField(max_length=2, blank=True, null=True)
-    group = models.ForeignKey(DbGroup, models.DO_NOTHING)
+    db_group = models.ForeignKey(DbGroup, models.DO_NOTHING)
+    group = models.ForeignKey(Group, null=True, on_delete=models.RESTRICT)
     organism = models.ForeignKey(Organism, models.DO_NOTHING, blank=True, null=True)
     concentration = models.FloatField()
     description = models.TextField(blank=True, null=True)
@@ -214,7 +218,7 @@ class RunLane(models.Model):
     def data_url(self):
         return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
     class Meta:
-        managed = False
+        managed = True
         db_table = 'run_lane'
         unique_together = (('run', 'lane_number'),)
 
@@ -234,7 +238,7 @@ class SysRuns(models.Model):
     image_server = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_runs'
 
 
@@ -249,7 +253,7 @@ class SysSpace(models.Model):
     date_last_check = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_space'
 
 
@@ -261,7 +265,7 @@ class User(models.Model):
     lastname = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'user'
 
 
@@ -272,7 +276,7 @@ class UserGroupPermission(models.Model):
     group = models.ForeignKey(DbGroup, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'user_group_permission'
         unique_together = (('user', 'permission', 'group'),)
 
@@ -284,6 +288,6 @@ class UserGroupRole(models.Model):
     group = models.ForeignKey(DbGroup, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'user_group_role'
         unique_together = (('user', 'role', 'group'),)

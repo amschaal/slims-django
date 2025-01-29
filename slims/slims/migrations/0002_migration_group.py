@@ -7,7 +7,7 @@ def import_groups(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     groups = []
     for group in DbGroup.objects.all():
-        groups.append(Group(name=group.db_group))
+        groups.append(Group(pk=group.pk, name=group.db_group))
     Group.objects.bulk_create(groups, 100)
 
 class Migration(migrations.Migration):
