@@ -9,45 +9,35 @@
     {{ run_form|crispy }}
     <h2 class="title">Lanes</h2>
     <div id="lanes-container">
-        <!-- <div class="columns is-mobile">
-            <div class="column">Group</div>
-            <div class="column">Project</div>
-            <div class="column">Concentration</div>
-            <div class="column">Description</div>
-        </div> -->
-            {{ lane_formset.management_form }}
-            {% for lane in lane_formset %}
-            <div class="columns is-mobile lane-form">
-                <div class="column is-1">
-                    <span class="lane_num">Lane {{lane.instance.lane_number}}</span>
-                </div>
-                {{ lane|crispy}}
-            </div>
-            {% endfor %}
+        {{ lane_formset | crispy }}
     </div>
-    <a class="button" id="add-lane">Add Lane</a>
-    <input class="button" type="submit" value="Submit" />
+    <a class="btn btn-success" id="add-lane">Add Lane</a>
+    <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
 
 <script>
-$(document).ready(function() {
-        let formIndex = $('.lane-form').length - 1; // Get the number of current forms
+let currentLane = {% if run_form.instance %}{{ run_form.instance.ordered_lanes.count }}{% else %}1{% endif%};
 
+$(document).ready(function() {
+        let formIndex = $('#lanes-container .multiField').length - 1; // Get the number of current forms
+        
         $('#add-lane').on('click', function() {
             // Clone the last form in the formset
-            let newForm = $('#lanes-container .lane-form').last().clone();
-            
+            let newForm = $('#lanes-container .multiField').last().clone();
+            currentLane++;
             // Reset input values (optional)
-            newForm.find('input, textarea').val('');
-
+            newForm.find('input, textarea, select').val('');
             // Update the form's IDs, names, and management form fields
             newForm.find('input, textarea, select').each(function() {
                 let name = $(this).attr('name');
                 name = name.replace('-' + (formIndex - 1) + '-', '-' + (formIndex+1) + '-');
                 $(this).attr('name', name);
                 $(this).attr('id', 'id_' + name);
+                if (name.indexOf('lane_number') > 0) {
+                    $(this).val(currentLane)
+                }
             });
-
+            newForm.find('.lane_number').html(currentLane);
             // Add the new form to the container
             $('#lanes-container').append(newForm);
             formIndex++;
@@ -59,8 +49,14 @@ $(document).ready(function() {
     });
 </script>
 <style>
-    /* .lane-form .field {
-        display: inline-block;
-    } */
+.multiField {
+  display: flex;
+  display: -webkit-flex;
+  align-items: flex-start;
+  -webkit-align-items: flex-start;
+}
+.multiField field {
+    display: inline-block;
+}
 </style>
 {% endblock %}

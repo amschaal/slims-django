@@ -3,7 +3,7 @@
 <h1 class="title">
     Runs
 </h1>
-<table id="runs" class="table is-striped" style="width:100%">
+<table id="runs" class="table table-striped" style="width:100%">
     <thead>
         <tr>
             <th>submitted</th>
@@ -36,13 +36,13 @@
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<a class="button" href="/runs/' + row.run_id + '/">view</a>'
+                        return '<a class="btn btn-primary" href="/runs/' + row.run_id + '/">view</a>'
                     }
                 },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<a class="button" href="/runs/' + row.run_id + '/edit/">edit</a>'
+                        return '<a class="btn btn-primary" href="/runs/' + row.run_id + '/edit/">edit</a>'
                     }
                 }
             ],

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block 'content' %}
 <h1 class="title">
-    View Run <a href="{% url 'edit_run' pk=run.pk %}" class="button">Edit</a>
+    View Run <a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a>
 </h1>
 <h2>General Data</h2>
 <table class="table">
@@ -14,7 +14,7 @@
     <tr><th>Notes</th><td>{{run.notes}}</td></tr>
 </table>
 <h2>Lanes</h2>
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr><th>Lane</th><th>Group</th><th>Organism</th><th>Concentration</th><th>Description</th><th>Controls</th></tr>
     </thead>
@@ -22,11 +22,11 @@
         {% for l in run.ordered_lanes %}
             <tr>
                 <td>{{l.lane_number}}</td>
-                <td>{{l.group.db_group}}</td>
+                <td>{{l.group}}</td>
                 <td>{{l.organism.name}}</td>
                 <td>{{l.concentration}}</td>
                 <td>{{l.description}}</td>
-                <td><a href="{{l.data_url}}" class="button">Data</a></td>
+                <td><a href="{{l.data_url}}" class="btn btn-primary">Data</a></td>
             </tr>
         {% endfor %}
     </tbody>
