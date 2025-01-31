@@ -40,3 +40,6 @@ def edit_run(request, pk=None):
         return redirect('run', pk=instance.pk)
     
     return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})
+
+def users(request):
+    return render(request, "users.html")

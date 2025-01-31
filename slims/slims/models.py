@@ -9,7 +9,7 @@
 #  Must first run: python manage.py migrate slims --fake-initial
 #  Then run: python manage.py migrate slims
 from django.db import models
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)

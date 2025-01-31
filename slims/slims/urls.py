@@ -19,13 +19,14 @@ from django.urls import path, include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from slims.api import router
+from slims.api.views import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("runs/", views.runs, name="runs"),
     path("runs/<int:pk>/", views.run, name="run"),
     path("runs/<int:pk>/edit/", views.edit_run, name="edit_run"),
+    path("users/", views.users, name="users"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

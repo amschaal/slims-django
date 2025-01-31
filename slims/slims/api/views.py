@@ -1,23 +1,16 @@
 from django.urls import path, include
 from django.contrib.auth.models import User
 from slims.models import Run
-from rest_framework import routers, serializers, viewsets
+from .serializers import UserSerializer, RunSerializer
+from rest_framework import routers, viewsets
 
-# Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'is_staff']
 
-class RunSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Run
-        exclude = []
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().prefetch_related('groups')
     serializer_class = UserSerializer
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'groups__name']
 
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Run.objects.all()
