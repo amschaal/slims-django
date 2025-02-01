@@ -43,3 +43,6 @@ def edit_run(request, pk=None):
 
 def users(request):
     return render(request, "users.html")
+
+def groups(request):
+    return render(request, "groups.html")

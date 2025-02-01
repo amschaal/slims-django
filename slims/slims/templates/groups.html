@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<h1 class="title">
+    Groups
+</h1>
+<table id="runs" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Users</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $('#runs').DataTable({
+            columns: [
+                { data: "name" },
+                {
+                    data: "users",
+                    render: function (data, type, row) {
+                        console.log(data, type, row)
+                        return data.map(
+                            function (user) { return '<a href="/users/' + user.id + '/">' + user.email + '</a>' }
+                        ).join(', ')
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<a class="btn btn-primary" href="/group/' + row.id + '/">Manage</a>'
+                    }
+                }
+            ],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                "url": "/api/groups/", // Django REST API URL
+                "data": function (d) {
+                    console.log('Requesting data with parameters:', d);
+                    d.limit = d.length; // Page size
+                    d.offset = d.start; // Starting point of the current page
+                    if (d.order && d.order.length > 0) {
+                        // `order[0][column]` gives us the column index, and `order[0][dir]` gives the direction
+                        var columnIndex = d.order[0].column;
+                        var columnName = $('#runs').DataTable().settings()[0].aoColumns[columnIndex].data;
+                        d.ordering = (d.order[0].dir === 'asc' ? '' : '-') + columnName; // DRF ordering syntax
+                    }
+                    // Sending the search term if provided
+                    if (d.search && d.search.value) {
+                        d.search = d.search.value;  // Pass search term directly to the API
+                    }
+                },
+                "dataSrc": {
+                    recordsTotal: 'count',
+                    recordsFiltered: 'count',
+                    data: 'results'
+                }
+            },
+            "lengthMenu": [10, 25, 50], // Options for page sizes
+            "pageLength": 10, // Default page size
+        });
+    });
+</script>
+{% endblock %}

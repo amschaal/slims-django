@@ -27,6 +27,7 @@ urlpatterns = [
     path("runs/<int:pk>/", views.run, name="run"),
     path("runs/<int:pk>/edit/", views.edit_run, name="edit_run"),
     path("users/", views.users, name="users"),
+    path("groups/", views.groups, name="groups"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
