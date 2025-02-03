@@ -26,6 +26,9 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
         # return RunLane.objects.all()
         user = self.request.user
         user_id = self.request.query_params.get('user_id', None)
+        group_id = self.request.query_params.get('group_id', None)
+        if group_id and self.request.user.is_staff:
+            return RunLane.objects.filter(group_id=group_id)
         if user_id and self.request.user.is_staff:
             user = User.objects.get(id=user_id)
         return RunLane.get_user_lanes(user)

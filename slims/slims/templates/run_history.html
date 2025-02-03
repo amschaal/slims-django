@@ -17,6 +17,7 @@
 </table>
 <script>
     let isStaff = {% if request.user.is_staff %}true{% else %} false{% endif %};
+    let query = '{% if profile_user %}?user_id={{profile_user.pk}}{% elif group %}?group_id={{group.id}}{% endif %}';
     $(document).ready(function () {
         $('#runs').DataTable({
             columns: [
@@ -44,7 +45,7 @@
             serverSide: true,
             ordering: false,
             ajax: {
-                "url": "/api/profile_lanes/{% if profile_user %}?user_id={{profile_user.pk}}{% endif %}", // Django REST API URL
+                "url": "/api/profile_lanes/"+query, // Django REST API URL
                 "data": function (d) {
                     console.log('Requesting data with parameters:', d);
                     d.limit = d.length; // Page size

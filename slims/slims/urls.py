@@ -30,6 +30,7 @@ urlpatterns = [
     path("users/<int:pk>/", views.profile, name="profile"),
     path("profile/", views.profile, name="profile"),
     path("groups/", views.groups, name="groups"),
+    path("groups/<int:pk>/", views.group, name="group"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

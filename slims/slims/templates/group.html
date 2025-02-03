@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<h3>Group: {{group.name}} </h3>
+<h3>Users:</h3> 
+{% for u in group.user_set.all %}
+    <div class="user" id="user-{{u.pk}}">{{u.first_name}} {{u.last_name}} (<a href="/users/{{u.pk}}/">{{u.email}}</a>)</div>
+{% endfor %}
+{% include 'run_history.html' %}
+{% endblock %}

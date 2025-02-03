@@ -3,7 +3,7 @@
 <h1 class="title">
     Groups
 </h1>
-<table id="runs" class="table table-striped" style="width:100%">
+<table id="groups" class="table table-striped" style="width:100%">
     <thead>
         <tr>
             <th>Group</th>
@@ -15,7 +15,7 @@
 </table>
 <script>
     $(document).ready(function () {
-        $('#runs').DataTable({
+        $('#groups').DataTable({
             columns: [
                 { data: "name" },
                 {
@@ -30,7 +30,7 @@
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="/group/' + row.id + '/">Manage</a>'
+                        return '<a class="btn btn-primary" href="/groups/' + row.id + '/">Manage</a>'
                     }
                 }
             ],
@@ -45,7 +45,7 @@
                     if (d.order && d.order.length > 0) {
                         // `order[0][column]` gives us the column index, and `order[0][dir]` gives the direction
                         var columnIndex = d.order[0].column;
-                        var columnName = $('#runs').DataTable().settings()[0].aoColumns[columnIndex].data;
+                        var columnName = $('#groups').DataTable().settings()[0].aoColumns[columnIndex].data;
                         d.ordering = (d.order[0].dir === 'asc' ? '' : '-') + columnName; // DRF ordering syntax
                     }
                     // Sending the search term if provided

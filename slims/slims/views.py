@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import Run
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
@@ -53,3 +53,9 @@ def profile(request, pk=None):
         return HttpResponseForbidden("Only staff have permission to view other user's profiles.")
     user = User.objects.get(pk=pk) if pk else request.user
     return render(request, "profile.html", {"profile_user": user})
+
+def group(request, pk):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Only staff have permission to view group details.")
+    group = Group.objects.get(pk=pk)
+    return render(request, "group.html", {"group": group})
