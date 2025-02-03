@@ -24,7 +24,7 @@
       <ul class="navbar-nav">
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Profile</a>
+          <a class="nav-link" href="{% url 'profile' %}">Profile</a>
         </li>
         {% if user.is_staff %}
         <li class="nav-item dropdown">
@@ -37,8 +37,8 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Administrative</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Manage Users</a></li>
-            <li><a class="dropdown-item" href="#">Manage Groups</a></li>
+            <li><a class="dropdown-item" href="{% url 'users' %}">Manage Users</a></li>
+            <li><a class="dropdown-item" href="{% url 'groups' %}">Manage Groups</a></li>
           </ul>
         </li>
         {% endif %}

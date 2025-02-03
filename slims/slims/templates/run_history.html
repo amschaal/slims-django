@@ -1,49 +1,50 @@
-{% extends "base.html" %}
-{% block 'content' %}
-<h1 class="title">
-    Users
-</h1>
+<h2>
+    Run History
+</h2>
 <table id="runs" class="table table-striped" style="width:100%">
     <thead>
         <tr>
-            <th>Email / Username</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Groups</th>
-            <th>Profile</th>
+            <th>Run Date</th>
+            <th>Machine</th>
+            <th>Lane</th>
+            <th>Group</th>
+            <th>Cycles</th>
+            <th>Description</th>
+            <th>Data</th>
         </tr>
     </thead>
     <tbody></tbody>
 </table>
 <script>
+    let isStaff = {% if request.user.is_staff %}true{% else %} false{% endif %};
     $(document).ready(function () {
-        console.log('Document ready, initializing DataTable...');
         $('#runs').DataTable({
             columns: [
-                { data: "email" },
-                { data: "first_name" },
-                { data: "last_name" },
-                // { data: "groups" },
+                { data: "run.run_date" },
+                { data: "run.machine" },
+                { data: "lane_number" },
                 {
-                    data: "groups",
+                    data: "group",
                     render: function (data, type, row) {
-                        console.log(data, type, row)
-                        return data.map(
-                            function (group) { return '<a href="/groups/' + group.id + '/">' + group.name + '</a>' }
-                        ).join(', ')
+                        return isStaff ? '<a href="/groups/' + data.id + '/">'+data.name+'</a>' : data.name
                     }
                 },
+                { data: "run.num_cycles" },
+                { data: "description" },
+
+                // { data: "data_url" },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="/users/' + row.id + '/">Profile</a>'
+                        return '<a class="btn btn-primary" href="' + row.data_url + '">Data</a>'
                     }
                 }
             ],
             processing: true,
             serverSide: true,
+            ordering: false,
             ajax: {
-                "url": "/api/users/", // Django REST API URL
+                "url": "/api/profile_lanes/{% if profile_user %}?user_id={{profile_user.pk}}{% endif %}", // Django REST API URL
                 "data": function (d) {
                     console.log('Requesting data with parameters:', d);
                     d.limit = d.length; // Page size
@@ -65,10 +66,19 @@
                     recordsFiltered: 'count',
                     data: 'results'
                 }
+                // function(json) {
+                //     return {
+                //         // draw: json.draw,  // The draw parameter that DataTables sends back
+                //         recordsTotal: json.count,  // Total number of records (before filtering)
+                //         recordsFiltered: json.count,  // Total after filtering (you can adjust this if needed)
+                //         data: json.results || []  // Actual data for the current page
+                //     };
+                //     // console.log('Received data:', json);  // Log the response for debugging
+                //     // return json.results || [];
+                // } 
             },
             "lengthMenu": [10, 25, 50], // Options for page sizes
             "pageLength": 10, // Default page size
         });
     });
 </script>
-{% endblock %}

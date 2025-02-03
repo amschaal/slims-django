@@ -27,6 +27,8 @@ urlpatterns = [
     path("runs/<int:pk>/", views.run, name="run"),
     path("runs/<int:pk>/edit/", views.edit_run, name="edit_run"),
     path("users/", views.users, name="users"),
+    path("users/<int:pk>/", views.profile, name="profile"),
+    path("profile/", views.profile, name="profile"),
     path("groups/", views.groups, name="groups"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),

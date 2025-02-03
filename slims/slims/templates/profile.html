@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block 'content' %}
+Username: {{profile_user.username}}
+Groups: {{profile_user.groups.all}}
+{% include 'run_history.html' %}
+{% endblock %}

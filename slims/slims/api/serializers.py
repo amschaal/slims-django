@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from slims.models import Run
+from slims.models import Run, RunLane
 from rest_framework import serializers
 
 
@@ -26,9 +26,17 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
     groups = GroupSerializer(many=True)
     class Meta:
         model = User
-        fields = ['url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups']
+        fields = ['id', 'url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups']
 
 class RunSerializer(serializers.ModelSerializer):
     class Meta:
         model = Run
+        exclude = []
+
+class RunLaneSerializer(serializers.ModelSerializer):
+    run = RunSerializer()
+    group = GroupSerializer()
+    data_url = serializers.URLField()
+    class Meta:
+        model = RunLane
         exclude = []

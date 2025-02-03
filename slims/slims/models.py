@@ -217,6 +217,9 @@ class RunLane(models.Model):
     @property
     def data_url(self):
         return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
+    @staticmethod
+    def get_user_lanes(user):
+        return RunLane.objects.filter(group__in=user.groups.all())
     class Meta:
         managed = True
         db_table = 'run_lane'
