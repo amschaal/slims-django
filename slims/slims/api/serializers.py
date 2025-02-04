@@ -3,7 +3,7 @@ from slims.models import Run, RunLane
 from rest_framework import serializers
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
-class GroupDetailSerializer(serializers.HyperlinkedModelSerializer):
+class GroupDetailSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
     def get_users(self, instance):
         return UserSerializer(instance.user_set.all(), many=True).data
@@ -22,11 +22,11 @@ class GroupDetailSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['id', 'name', 'users']
 
-class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
+class UserDetailSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     class Meta:
         model = User
-        fields = ['id', 'url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups']
 
 class RunSerializer(serializers.ModelSerializer):
     class Meta:

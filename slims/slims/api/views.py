@@ -3,16 +3,34 @@ from django.contrib.auth.models import User, Group
 from slims.models import Run, RunLane
 from .serializers import UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer
 from rest_framework import routers, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().prefetch_related('groups')
     serializer_class = UserDetailSerializer
-    search_fields = ['username', 'email', 'first_name', 'last_name', 'groups__name']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all().prefetch_related('user_set')
     serializer_class = GroupDetailSerializer
+    filterset_fields = { 'name':['icontains']}
     search_fields = ['name', 'user__email', 'user__first_name', 'user__last_name', 'user__username']
+    @action(detail=True, methods=['post'])
+    def add_users(self, request, pk=None):
+        group = self.get_object()
+        user_ids = request.data.getlist('users', [])
+        users = User.objects.filter(id__in=user_ids)
+        group.user_set.add(*users)
+        return Response({'users': UserDetailSerializer(users, many=True).data})
+    @action(detail=True, methods=['post'])
+    def remove_users(self, request, pk=None):
+        group = self.get_object()
+        user_ids = request.data.getlist('users', [])
+        users = User.objects.filter(id__in=user_ids)
+        group.user_set.remove(*users)
+        return Response({'users': UserDetailSerializer(users, many=True).data})
+        
 
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Run.objects.all()
