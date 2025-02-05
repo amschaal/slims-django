@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block 'content' %}
-Username: {{profile_user.username}}
-Groups: {{profile_user.groups.all}}
+<h2>User Profile</h2>
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <h5 class="card-title">User: {{profile_user.first_name}} {{profile_user.last_name}}</h5>
+        <h5 class="card-title">Email: {{profile_user.email}}</h5>
+        <h5 class="card-title">
+            Groups:
+            {% for g in profile_user.groups.all %}
+                <a href="/groups/{{g.id}}/">{{g.name}}</a> {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </h5> 
+    </div>
+</div>
 {% include 'run_history.html' %}
 {% endblock %}
