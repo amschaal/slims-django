@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'crispy_forms',
-    'crispy_bulma',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -134,7 +134,12 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 'rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter']
 }
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
-CRISPY_TEMPLATE_PACK = 'bulma'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap5",)
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "slims.auth.MD5AuthenticationBackend"
+]
 
 from .config import *
