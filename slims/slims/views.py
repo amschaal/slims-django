@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Run
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
-
+@user_passes_test(lambda u: u.is_staff)
 def runs(request):
     return render(request, "runs.html", { })
 
+@user_passes_test(lambda u: u.is_staff)
 def run(request, pk):
     run = Run.objects.get(pk=pk)
     return render(request, "run.html", { "run": run})
@@ -24,7 +26,7 @@ def edit_run_old(request, pk):
     
     return render(request, "edit_run.html", { "form": form})
 
-
+@user_passes_test(lambda u: u.is_staff)
 def edit_run(request, pk=None):
     helper = RunLaneHelper()
     if pk:
@@ -42,18 +44,22 @@ def edit_run(request, pk=None):
     
     return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})
 
+@user_passes_test(lambda u: u.is_staff)
 def users(request):
     return render(request, "users.html")
 
+@user_passes_test(lambda u: u.is_staff)
 def groups(request):
     return render(request, "groups.html")
 
+@login_required
 def profile(request, pk=None):
     if pk and not request.user.is_staff:
         return HttpResponseForbidden("Only staff have permission to view other user's profiles.")
     user = User.objects.get(pk=pk) if pk else request.user
     return render(request, "profile.html", {"profile_user": user})
 
+@login_required
 def group(request, pk):
     if not request.user.is_staff:
         return HttpResponseForbidden("Only staff have permission to view group details.")

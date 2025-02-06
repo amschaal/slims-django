@@ -33,4 +33,5 @@ urlpatterns = [
     path("groups/<int:pk>/", views.group, name="group"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
+    path("accounts/", include("django.contrib.auth.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
