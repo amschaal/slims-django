@@ -1,10 +1,12 @@
 from django.urls import path, include
 from django.contrib.auth.models import User, Group
+from django.db.models import Count
 from slims.models import Run, RunLane
 from .serializers import UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer
 from rest_framework import routers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().prefetch_related('groups')
@@ -30,16 +32,16 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
         users = User.objects.filter(id__in=user_ids)
         group.user_set.remove(*users)
         return Response({'users': UserDetailSerializer(users, many=True).data})
-        
 
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Run.objects.all()
+    queryset = Run.objects.all().annotate(num_lanes=Count('lanes'))
     serializer_class = RunSerializer
     ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'num_cycles', 'run_dir']
     ordering = ['run_date']
-    search_fields = ['run_date', 'machine', 'submitted', 'run_type', 'description']
+    search_fields = ['run_date', 'machine', 'submitted', 'run_type', 'run_dir', 'description']
 
 class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         # return RunLane.objects.all()
         user = self.request.user

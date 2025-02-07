@@ -29,6 +29,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups']
 
 class RunSerializer(serializers.ModelSerializer):
+    num_lanes = serializers.IntegerField(read_only=True)
     class Meta:
         model = Run
         exclude = []

@@ -6,12 +6,13 @@
 <table id="runs" class="table table-striped" style="width:100%">
     <thead>
         <tr>
-            <th>submitted</th>
-            <th>run_date</th>
-            <th>machine</th>
-            <th>run_dir</th>
-            <th>num_cycles</th>
-            <th>description</th>
+            <th>Submitted</th>
+            <th>Run date</th>
+            <th>Machine</th>
+            <th>Run Directory</th>
+            <th># Cycles</th>
+            <th># Lanes</th>
+            <th>Description</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -25,22 +26,28 @@
                     data: "submitted",
                     render: function (data, type, row) {
                         console.log('data', data, type, row)
-                        return '<a href="/runs/' + row.run_id + '/">' + row.submitted + '</a>'
+                        return '<a href="/runs/' + row.run_id + '/">' + moment(row.submitted).format('MM/DD/YYYY') + '</a>'
                     }
                 },
-                { data: "run_date" },
+                { data: "run_date", render: DataTable.render.date()},
                 { data: "machine" },
-                { data: "run_dir" },
+                { data: "run_dir", sortable: false },
                 { data: "num_cycles" },
-                { data: "description" },
+                { 
+                    data: "num_lanes",
+                    sortable: false
+                 },
+                { data: "description", sortable: false },
                 {
                     data: null,
+                    sortable: false,
                     render: function (data, type, row) {
                         return '<a class="btn btn-primary" href="/runs/' + row.run_id + '/">view</a>'
                     }
                 },
                 {
                     data: null,
+                    sortable: false,
                     render: function (data, type, row) {
                         return '<a class="btn btn-primary" href="/runs/' + row.run_id + '/edit/">edit</a>'
                     }
