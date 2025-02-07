@@ -177,12 +177,15 @@ class Run(models.Model):
     request_transfer = models.IntegerField(blank=True, null=True)
     last_transfer = models.DateTimeField(blank=True, null=True)
     run_type = models.CharField(max_length=15, blank=True, null=True)
-    def ordered_lanes(self):
-        return self.lanes.all().order_by('lane_number')
+    def ordered_lanes(self, user=None):
+        lanes = self.lanes.all().order_by('lane_number')
+        if user and not user.is_staff:
+            return lanes.filter(group__in=user.groups.all())
+        else:
+            return lanes
     class Meta:
         managed = True
         db_table = 'run'
-
 
 class RunEmail(models.Model):
     email_id = models.AutoField(primary_key=True)

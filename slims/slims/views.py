@@ -9,10 +9,13 @@ from .forms import RunForm, LaneFormSet, RunLaneHelper
 def runs(request):
     return render(request, "runs.html", { })
 
-@user_passes_test(lambda u: u.is_staff)
+@login_required
 def run(request, pk):
     run = Run.objects.get(pk=pk)
-    return render(request, "run.html", { "run": run})
+    lanes = run.ordered_lanes(user=request.user)
+    if not request.user.is_staff and lanes.count() == 0:
+        return HttpResponseForbidden("You do not have access to any lanes in this run.")
+    return render(request, "run.html", { "run": run, "lanes": lanes})
 
 def edit_run_old(request, pk):
     run = Run.objects.get(pk=pk)
@@ -41,7 +44,7 @@ def edit_run(request, pk=None):
         instance = run_form.save()
         lane_formset.save()
         return redirect('run', pk=instance.pk)
-    
+
     return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})
 
 @user_passes_test(lambda u: u.is_staff)
@@ -61,7 +64,9 @@ def profile(request, pk=None):
 
 @login_required
 def group(request, pk):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Only staff have permission to view group details.")
     group = Group.objects.get(pk=pk)
+    if request.user.is_staff:
+        return render(request, "group_staff.html", {"group": group})
+    elif group not in request.user.groups.all():
+        return HttpResponseForbidden("You must be a member of the group to view this page.")
     return render(request, "group.html", {"group": group})

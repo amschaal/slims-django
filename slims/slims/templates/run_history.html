@@ -37,7 +37,7 @@
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="' + row.data_url + '">Data</a>'
+                        return '<a class="btn btn-primary" href="/runs/' + row.run.run_id + '/">Run</a> <a class="btn btn-primary" href="' + row.data_url + '">Data</a>'
                     }
                 }
             ],
