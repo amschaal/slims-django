@@ -2,7 +2,7 @@
 {% block 'content' %}
 <h1 class="title">
     View Run
-    {% if user.is_staff %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a>{% endif%}
+    {% if user.is_staff %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> <a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif%}
 </h1>
 <h2>General Data</h2>
 <table class="table">
@@ -34,4 +34,12 @@
 
 </table>
 
+<script>
+    let delete_url = "{% url 'delete_run' pk=run.pk %}";
+    function delete_run() {
+        if (confirm('Are you absolutely sure you want to delete this run?')) {
+            window.location.href = delete_url;
+        }
+    }
+</script>
 {% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Run
+from .models import Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
 @user_passes_test(lambda u: u.is_staff)
@@ -17,33 +17,30 @@ def run(request, pk):
         return HttpResponseForbidden("You do not have access to any lanes in this run.")
     return render(request, "run.html", { "run": run, "lanes": lanes})
 
-def edit_run_old(request, pk):
+@user_passes_test(lambda u: u.is_staff)
+def delete_run(request, pk):
     run = Run.objects.get(pk=pk)
-    if request.method == 'POST':
-        form = RunForm(request.POST, instance=run)
-        if form.is_valid():
-            instance = form.save()
-            return redirect('run', pk=pk)
-    else:
-        form = RunForm(instance=run)
-    
-    return render(request, "edit_run.html", { "form": form})
+    RunLane.objects.filter(run=run).delete()
+    run.delete()
+    return render(request, "run_deleted.html", { "run": run})
 
 @user_passes_test(lambda u: u.is_staff)
 def edit_run(request, pk=None):
     helper = RunLaneHelper()
+    run = Run()
     if pk:
         run = Run.objects.get(pk=pk)
-        run_form = RunForm(request.POST or None, instance=run)
-        lane_formset = LaneFormSet(request.POST or None, instance=run)
-    else:
-        run_form = RunForm(request.POST or None)
-        lane_formset = LaneFormSet(request.POST or None, instance=run)
+    
+    run_form = RunForm(request.POST or None, instance=run)
+    lane_formset = LaneFormSet(request.POST or None, instance=run)
 
-    if request.method == 'POST' and run_form.is_valid() and lane_formset.is_valid():
-        instance = run_form.save()
-        lane_formset.save()
-        return redirect('run', pk=instance.pk)
+    if request.method == 'POST':
+        if run_form.is_valid() and lane_formset.is_valid():
+            run = run_form.save()
+            lane_formset = LaneFormSet(request.POST, instance=run)
+            lane_formset.is_valid()
+            lane_formset.save()
+            return redirect('run', pk=run.pk)
 
     return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})
 

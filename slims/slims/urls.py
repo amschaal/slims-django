@@ -24,7 +24,9 @@ from slims.api.views import router
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("runs/", views.runs, name="runs"),
+    path("runs/create/", views.edit_run, name="create_run"),
     path("runs/<int:pk>/", views.run, name="run"),
+    path("runs/<int:pk>/delete/", views.delete_run, name="delete_run"),
     path("runs/<int:pk>/edit/", views.edit_run, name="edit_run"),
     path("users/", views.users, name="users"),
     path("users/<int:pk>/", views.profile, name="profile"),

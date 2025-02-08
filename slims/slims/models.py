@@ -167,7 +167,7 @@ class RolePermission(models.Model):
 class Run(models.Model):
     run_id = models.AutoField(primary_key=True)
     description = models.TextField(blank=True, null=True)
-    submitted = models.DateTimeField(blank=True, null=True)
+    submitted = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     num_cycles = models.IntegerField(blank=True, null=True)
     run_date = models.DateField(blank=True, null=True)
     machine = models.CharField(max_length=100, blank=True, null=True)
