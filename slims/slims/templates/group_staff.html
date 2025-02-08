@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+{% block 'head' %}
+<script src="{% static 'select2/js/select2.full.js' %}"></script>
+<link href="{% static 'select2/css/select2.css' %}" rel="stylesheet" />
+<style>
+    .select2-container {
+        width: 80% !important;
+    }
+
+    /* Make the Select2 dropdown more spacious */
+    .select2-container .select2-selection--multiple {
+        min-height: 38px;
+        /* Height of the select box */
+        border: 1px solid #ccc;
+        /* Border color */
+        border-radius: 0.375rem;
+        /* Border radius for rounded corners */
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        padding: 4px;
+        /* Padding inside the selection box */
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        /* Background color for selected items */
+        color: white;
+        /* Text color */
+        border-radius: 5px;
+        /* Rounded corners for selected items */
+    }
+
+    .select2-container .select2-dropdown {
+        border-radius: 0.375rem;
+        /* Match border radius with selection box */
+    }
+
+    /* Customize search box inside the dropdown */
+    .select2-container .select2-search--dropdown .select2-search__field {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 0.375rem;
+    }
+
+    .new-user {
+        /* background-color: lightgreen; */
+    }
+</style>
+{% endblock %}
+{% block 'content' %}
+<h3>Group: {{group.name}}</h3>
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <h5 class="card-title">Users</h5>
+        <div class="input-group">
+            <select id="users-select" multiple="multiple" name="new_users"></select>
+            <div class="input-group-addon input-group-button"><button id="add-user" class="btn btn-success">Add
+                    users</button></div>
+        </div>
+        <div id="current-users" class="p-3">
+            {% for u in group.user_set.all %}
+            <div class="user" id="user-{{u.pk}}"><label><input type="checkbox" name="remove_users" value="{{u.pk}}" />
+                    {{u.first_name}} {{u.last_name}}</label> (<a href="/users/{{u.pk}}/">{{u.email}}</a>)</div>
+            {% endfor %}
+        </div>
+        <button id="remove-users" class="btn btn-danger">Remove selected users</button>
+    </div>
+</div>
+{% include 'run_history.html' %}
+<script>
+    // $.ajaxSetup({ traditional: true });
+    $(document).ready(function () {
+        $('#users-select').select2({
+            placeholder: "Search users to add...",
+            minimumInputLength: 2,
+            ajax: {
+                url: '/api/users',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        offset: (params.page || 0) * 10,  // Use pagination with limit/offset
+                        limit: 10
+                    }
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    let results = data.results.map(function (u) { return { id: u.id, text: u.first_name + ' ' + u.last_name + ' (' + u.email + ')' } })
+                    console.log('options', results)
+                    return {
+                        results: results,  // Your paginated results here
+                        pagination: {
+                            more: data.next != null  // Check if more data is available
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+        function user_to_html(user) {
+            return '<div class="user new-user" id="user-' + user.id + '"><label><input type="checkbox" name="remove_users" value="' + user.id + '"/> ' + user.first_name + ' ' + user.last_name + '</label> (<a href="/users/' + user.id + '/">' + user.email + '</a>) <span class="text-success">Added</span></div>';
+        }
+        function add_users(ajax) {
+            let users = ajax.responseJSON.users;
+            users.forEach(user => {
+                let userHTML = user_to_html(user)
+                $('#current-users').append($(userHTML).hide().fadeIn(2000))
+            });
+            $('#users-select').val(null).trigger('change');
+        }
+        $('#add-user').click(function () {
+            jQuery.ajax({
+                url: '/api/groups/{{group.id}}/add_users/',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                method: 'POST',
+                data: { users: $('#users-select').val() },
+                traditional: true,
+                complete: add_users
+            })
+        });
+        function remove_user_nodes(ajax) {
+            let users = ajax.responseJSON.users;
+            console.log('removed', users)
+            let selectors = users.map(function (u) { return '#user-' + u.id || u }).join(', ')
+            console.log('selectors', selectors)
+            $(selectors, '#current-users').addClass('bg-danger').fadeOut(2000, function () { $(this).remove() });
+        }
+        $('#remove-users').click(function () {
+            let users = $('input[name=remove_users]:checked')
+                .map(function () {
+                    return $(this).val();
+                }).toArray();
+            jQuery.ajax({
+                url: '/api/groups/{{group.id}}/remove_users/',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                method: 'POST',
+                data: { users: users },
+                traditional: true,
+                complete: remove_user_nodes
+            })
+        })
+    });
+</script>
+{% endblock %}
