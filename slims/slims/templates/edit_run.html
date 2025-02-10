@@ -16,35 +16,39 @@
 </form>
 
 <script>
-let currentLane = {% if run_form.instance %}{{ run_form.instance.ordered_lanes.count }}{% else %}1{% endif%};
-
+let currentIndex = {% if run_form.instance and run_form.instance.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
 $(document).ready(function() {
         let formIndex = $('#lanes-container .multiField').length - 1; // Get the number of current forms
         
         $('#add-lane').on('click', function() {
+            var newIndex = currentIndex + 1;
             // Clone the last form in the formset
             let newForm = $('#lanes-container .multiField').last().clone();
-            currentLane++;
-            // Reset input values (optional)
+            // Reset input values
             newForm.find('input, textarea, select').val('');
             // Update the form's IDs, names, and management form fields
             newForm.find('input, textarea, select').each(function() {
                 let name = $(this).attr('name');
-                name = name.replace('-' + (formIndex - 1) + '-', '-' + (formIndex+1) + '-');
+                name = name.replace('-' + currentIndex + '-', '-' + newIndex + '-');
                 $(this).attr('name', name);
-                $(this).attr('id', 'id_' + name);
-                if (name.indexOf('lane_number') > 0) {
-                    $(this).val(currentLane)
-                }
             });
-            newForm.find('.lane_number').html(currentLane);
+            newForm.find('[id]').each(function() {
+                let id = $(this).attr('id');
+                id = id.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                $(this).attr('id', id);
+            });
+            newForm.find('[for]').each(function() {
+                let val = $(this).attr('for');
+                val = val.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                $(this).attr('for', val);
+            });
+            newForm.find('.lane_number').html(currentIndex);
             // Add the new form to the container
             $('#lanes-container').append(newForm);
-            formIndex++;
-            console.log('formIndex', formIndex)
 
             // Update the management form's total form count
-            $('#id_lanes-TOTAL_FORMS').val(formIndex);
+            currentIndex = newIndex;
+            $('#id_lanes-TOTAL_FORMS').val(newIndex + 1);
         });
     });
 </script>
