@@ -1,4 +1,5 @@
 from django.db import migrations
+from django.utils.crypto import get_random_string
 
 def import_users(apps, schema_editor):
     SlimsUser = apps.get_model("slims", "User")
@@ -11,7 +12,7 @@ def import_users(apps, schema_editor):
         if username in used_logins:
             duplicate_users.append(username)
             continue
-        password = u.password or User.objects.make_random_password()
+        password = u.password or get_random_string(length=32)
         users.append(User(pk=u.pk, username=username, email=username, password=password, first_name=u.firstname, last_name=u.lastname))
         used_logins.add(username)
     User.objects.bulk_create(users, 100)
