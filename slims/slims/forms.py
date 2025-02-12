@@ -4,9 +4,14 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
 
 class RunForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        required_fields = ["machine"]
+        for field in required_fields:
+            self.fields[field].required = True
     class Meta:
         model = Run
-        fields = ["run_date", "run_dir", "description", "notes"]
+        fields = ["run_date", "machine", "run_dir", "description", "notes"]
 
 # Following helper is not working for some reason.
 class RunLaneHelper(FormHelper):
@@ -22,19 +27,26 @@ class RunLaneHelper(FormHelper):
         )
 
 class RunLaneForm(forms.ModelForm):
-    # lane_number = forms.HiddenInput()
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows']=2
+        # if self.instance:
+        #     self.fields['lane_number'].disabled = True
+        # self.fields['lane_number'].la = 'foo'
     class Meta:
+        widgets = {
+            'lane_number': forms.NumberInput({'class': 'lane-input'})
+        }
+        labels = {
+            'lane_number': 'Lane'
+        }
         model = RunLane
-        fields = ["group", "project_id", "concentration", "description"]
+        fields = ["lane_number", "group", "project_id", "lane_dir", "concentration", "description"]
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 
 class RunWithLanesForm(forms.Form):
     def __init__(self, **kwargs):
-        kwargs.pop()
         super().__init__(**kwargs)
     run = RunForm()
     lanes = LaneFormSet(queryset=RunLane.objects.none())  # Pass an empty queryset initially

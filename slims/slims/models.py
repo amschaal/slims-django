@@ -10,6 +10,7 @@
 #  Then run: python manage.py migrate slims
 from django.db import models
 from django.contrib.auth.models import Group
+from django.utils import timezone
 
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)
@@ -183,6 +184,9 @@ class Run(models.Model):
             return lanes.filter(group__in=user.groups.all())
         else:
             return lanes
+    def can_delete(self):
+        days_old = (timezone.now() - self.submitted).days
+        return days_old < 7
     class Meta:
         managed = True
         db_table = 'run'
