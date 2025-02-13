@@ -20,6 +20,8 @@ def run(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def delete_run(request, pk):
     run = Run.objects.get(pk=pk)
+    if not run.can_delete:
+        return HttpResponseForbidden("You may not delete this run.")
     RunLane.objects.filter(run=run).delete()
     run.delete()
     return render(request, "run_deleted.html", { "run": run})
@@ -30,7 +32,9 @@ def edit_run(request, pk=None):
     run = Run()
     if pk:
         run = Run.objects.get(pk=pk)
-    
+        if not run.can_modify:
+            lanes = run.ordered_lanes(user=request.user)
+            return render(request, "run.html", { "run": run, "lanes": lanes, "message": "This run may no longer be modified."})
     run_form = RunForm(request.POST or None, instance=run)
     lane_formset = LaneFormSet(request.POST or None, instance=run)
 

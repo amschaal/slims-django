@@ -32,6 +32,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 class RunSerializer(serializers.ModelSerializer):
     num_lanes = serializers.IntegerField(read_only=True)
+    can_modify = serializers.BooleanField(read_only=True)
     class Meta:
         model = Run
         exclude = []

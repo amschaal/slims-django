@@ -50,7 +50,7 @@
                     data: null,
                     sortable: false,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="/runs/' + row.run_id + '/edit/">edit</a>'
+                        return row.can_modify ? '<a class="btn btn-primary" href="/runs/' + row.run_id + '/edit/">edit</a>' : ''
                     }
                 }
             ],

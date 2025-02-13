@@ -2,8 +2,11 @@
 {% block 'content' %}
 <h1 class="title">
     View Run
-    {% if user.is_staff %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
+    {% if user.is_staff and run.can_modify %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
 </h1>
+{% if message %}
+<h2>{{message}}</h2>
+{% endif %}
 <h2>General Data</h2>
 <table class="table">
     <tr><th>Machine</th><td>{{run.machine}}</td></tr>
@@ -17,13 +20,15 @@
 <h2>Lanes</h2>
 <table class="table table-striped">
     <thead>
-        <tr><th>Lane</th><th>Group</th><th>Organism</th><th>Concentration</th><th>Description</th><th>Controls</th></tr>
+        <tr><th>Lane</th><th>Group</th><th>Project ID</th><th>Lane Dir</th><th>Organism</th><th>Concentration</th><th>Description</th><th>Controls</th></tr>
     </thead>
     <tbody>
         {% for l in lanes %}
             <tr>
                 <td>{{l.lane_number}}</td>
                 <td>{{l.group}}</td>
+                <td>{{l.project_id}}</td>
+                <td>{{l.lane_dir}}</td>
                 <td>{{l.organism.name}}</td>
                 <td>{{l.concentration}}</td>
                 <td>{{l.description}}</td>

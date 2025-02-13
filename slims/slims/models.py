@@ -8,6 +8,9 @@
 
 #  Must first run: python manage.py migrate slims --fake-initial
 #  Then run: python manage.py migrate slims
+import random
+import string
+import uuid
 from django.db import models
 from django.contrib.auth.models import Group, User as AuthUser
 from django.utils import timezone
@@ -184,9 +187,14 @@ class Run(models.Model):
             return lanes.filter(group__in=user.groups.all())
         else:
             return lanes
+    @property
     def can_delete(self):
         days_old = (timezone.now() - self.submitted).days
         return days_old < 7
+    @property
+    def can_modify(self):
+        days_old = (timezone.now() - self.submitted).days
+        return days_old < 90
     class Meta:
         managed = True
         db_table = 'run'
@@ -203,6 +211,8 @@ class RunEmail(models.Model):
         managed = True
         db_table = 'run_email'
 
+def generate_random_string(length=15):
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(length))
 
 class RunLane(models.Model):
     run_lane_id = models.AutoField(primary_key=True)
@@ -211,9 +221,9 @@ class RunLane(models.Model):
     # db_group = models.ForeignKey(DbGroup, models.DO_NOTHING)
     group = models.ForeignKey(Group, on_delete=models.RESTRICT)
     organism = models.ForeignKey(Organism, models.DO_NOTHING, blank=True, null=True)
-    concentration = models.FloatField()
+    concentration = models.FloatField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    random_dir = models.CharField(unique=True, max_length=10, blank=True, null=True)
+    random_dir = models.CharField(unique=True, max_length=15, blank=True, null=True, default=generate_random_string)
     delete_analysis_permitted = models.DateTimeField(blank=True, null=True)
     delete_images_permitted = models.DateTimeField(blank=True, null=True)
     images_deleted_by = models.IntegerField(blank=True, null=True)
