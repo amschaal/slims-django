@@ -2,7 +2,7 @@
 {% block 'content' %}
 <h1 class="title">
     View Run
-    {% if user.is_staff %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> <a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif%}
+    {% if user.is_staff %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
 </h1>
 <h2>General Data</h2>
 <table class="table">

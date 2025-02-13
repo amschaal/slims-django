@@ -9,7 +9,7 @@
 #  Must first run: python manage.py migrate slims --fake-initial
 #  Then run: python manage.py migrate slims
 from django.db import models
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User as AuthUser
 from django.utils import timezone
 
 class Address(models.Model):
@@ -301,3 +301,8 @@ class UserGroupRole(models.Model):
         managed = True
         db_table = 'user_group_role'
         unique_together = (('user', 'role', 'group'),)
+
+
+def is_pi(self):
+    return self.has_perm('auth.is_pi')
+AuthUser.is_pi = is_pi

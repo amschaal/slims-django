@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all().prefetch_related('groups')
+    queryset = User.objects.all().prefetch_related('groups', 'user_permissions')
     serializer_class = UserDetailSerializer
     search_fields = ['username', 'email', 'first_name', 'last_name']
 
