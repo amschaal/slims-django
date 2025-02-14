@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from coreomics.models import Submission
 from slims.models import Run, RunLane
 from rest_framework import serializers
 
@@ -44,3 +45,8 @@ class RunLaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = RunLane
         exclude = []
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        exclude = ['data']
