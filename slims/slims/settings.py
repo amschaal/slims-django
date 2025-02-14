@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'slims',
+    'coreomics',
     'rest_framework',
     'django_filters',
     'crispy_forms',
