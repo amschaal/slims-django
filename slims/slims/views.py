@@ -34,19 +34,20 @@ def edit_run(request, pk=None):
         run = Run.objects.get(pk=pk)
         if not run.can_modify:
             lanes = run.ordered_lanes(user=request.user)
-            return render(request, "run.html", { "run": run, "lanes": lanes, "message": "This run may no longer be modified."})
-    run_form = RunForm(request.POST or None, instance=run)
-    lane_formset = LaneFormSet(request.POST or None, instance=run)
+            return render(request, run.run_class.run_template, { "run": run, "lanes": lanes, "message": "This run may no longer be modified."})
+    
+    run_form = run.run_class.run_form(request.POST or None, instance=run)
+    lane_formset = run.run_class.lane_formset(request.POST or None, instance=run)
 
     if request.method == 'POST':
         if run_form.is_valid() and lane_formset.is_valid():
             run = run_form.save()
-            lane_formset = LaneFormSet(request.POST, instance=run)
+            lane_formset = run.run_class.lane_formset(request.POST, instance=run)
             lane_formset.is_valid()
             lane_formset.save()
             return redirect('run', pk=run.pk)
 
-    return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "helper": helper})
+    return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "run": run, "helper": helper})
 
 @user_passes_test(lambda u: u.is_staff)
 def users(request):

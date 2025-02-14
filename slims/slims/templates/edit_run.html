@@ -2,7 +2,11 @@
 {% load crispy_forms_tags %}
 {% block 'content' %}
 <h1 class="title">
-    Edit Run
+    {% if run.pk %}
+        Edit Run
+    {% else %}
+        Create Run
+    {% endif %}
 </h1>
 <form method="POST" action=".">
     {% csrf_token %}
@@ -11,12 +15,15 @@
     <div id="lanes-container">
         {{ lane_formset | crispy }}
     </div>
+    {% if run.pk %}
+        <a class="btn btn-danger" href="{% url 'run' pk=run.pk%}">Cancel</a>
+    {% endif %}
     <a class="btn btn-success" id="add-lane">Add Lane</a>
     <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
 
 <script>
-let currentIndex = {% if run_form.instance and run_form.instance.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
+let currentIndex = {% if run.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
 $(document).ready(function() {
         let formIndex = $('#lanes-container .multiField').length - 1; // Get the number of current forms
         

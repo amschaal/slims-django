@@ -195,6 +195,10 @@ class Run(models.Model):
     def can_modify(self):
         days_old = (timezone.now() - self.submitted).days
         return days_old < 90
+    @property
+    def run_class(self):
+        from .run_type import RunType
+        return RunType(self)
     class Meta:
         managed = True
         db_table = 'run'
