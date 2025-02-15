@@ -61,7 +61,7 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
 class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    ordering_fields = ['submitted', 'internal_id']
+    ordering_fields = ['submitted', 'internal_id', 'submitter_name', 'submitter_email', 'pi_name', 'pi_email', 'submission_type']
     ordering = ['-submitted']
     search_fields = ['internal_id', 'id', 'submitter_name', 'pi_name', 'submitter_email', 'pi_email', 'submission_type']
 

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<h1 class="title">
+    Submissions
+</h1>
+<table id="submissions" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Submitted</th>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Submitter</th>
+            <th>Submitter Email</th>
+            <th>PI</th>
+            <th>PI Email</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        console.log('Document ready, initializing DataTable...');
+        $('#submissions').DataTable({
+            columns: [
+                { data: "submitted",
+                    render: function (data, type, row) {
+                        return moment(row.submitted).format('MM/DD/YYYY')
+                    }
+                },
+                { data: "internal_id",
+                    render: function (data, type, row) {
+                        return '<a target="_blank" href="' + row.url + '/">'+ (data || row.id)+'</a>'
+                    }
+                },
+                { data: "submission_type" },
+                { data: "submitter_name" },
+                { data: "submitter_email" },
+                { data: "pi_name" },
+                { data: "pi_email" },
+                {
+                    data: 'id',
+                    render: function (data, type, row) {
+                        return '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>'
+                    }
+                }
+            ],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                "url": "/api/submissions/", // Django REST API URL
+                "data": function (d) {
+                    d.limit = d.length; // Page size
+                    d.offset = d.start; // Starting point of the current page
+                    if (d.order && d.order.length > 0) {
+                        // `order[0][column]` gives us the column index, and `order[0][dir]` gives the direction
+                        var columnIndex = d.order[0].column;
+                        var columnName = $('#submissions').DataTable().settings()[0].aoColumns[columnIndex].data;
+                        d.ordering = (d.order[0].dir === 'asc' ? '' : '-') + columnName; // DRF ordering syntax
+                    }
+
+                    // Sending the search term if provided
+                    if (d.search && d.search.value) {
+                        d.search = d.search.value;  // Pass search term directly to the API
+                    }
+                },
+                "dataSrc": {
+                    recordsTotal: 'count',
+                    recordsFiltered: 'count',
+                    data: 'results'
+                }
+            },
+            "lengthMenu": [10, 25, 50], // Options for page sizes
+            "pageLength": 10, // Default page size
+        });
+    });
+</script>
+{% endblock %}

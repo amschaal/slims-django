@@ -72,3 +72,7 @@ def group(request, pk):
     elif group not in request.user.groups.all():
         return HttpResponseForbidden("You must be a member of the group to view this page.")
     return render(request, "group.html", {"group": group})
+
+@user_passes_test(lambda u: u.is_staff)
+def submissions(request):
+    return render(request, "submissions.html")
