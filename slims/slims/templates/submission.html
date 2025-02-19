@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <h3 class="card-title"><a href="{% url 'submissions' %}">Submissions</a> / {{submission.internal_id}}</h3>
+        <table class="table">
+            <tr><th>Submitted</th><td>{{submission.submitted}}</td></tr>
+            <tr><th>Type</th><td>{{submission.submission_type}}</td></tr>
+            <tr><th>Submitter</th><td>{{submission.submitter_name}} ({{submission.submitter_email}})</td></tr>
+            <tr><th>PI</th><td>{{submission.pi_name}} ({{submission.pi_email}})</td></tr>
+            <tr><th>URL</th><td><a href="{{submission.url}}" target="_blank">{{submission.url}}</a></td></tr>
+        </table>
+    </div>
+</div>
+{% include 'run_history.html' with query='submission='|add:submission.id %}
+{% endblock %}

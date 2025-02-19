@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
+
+from coreomics.models import Submission
 from .models import Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
@@ -76,3 +78,8 @@ def group(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def submissions(request):
     return render(request, "submissions.html")
+
+@user_passes_test(lambda u: u.is_staff)
+def submission(request, pk):
+    submission = Submission.objects.get(pk=pk)
+    return render(request, "submission.html", {"submission": submission})
