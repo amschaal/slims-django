@@ -12,5 +12,26 @@
         </table>
     </div>
 </div>
-{% include 'run_history.html' with query='submission='|add:submission.id %}
+{% if submission.lanes.all.count %}
+<table class="table table-striped">
+    <thead>
+        <tr><th>Run Date</th><th>Lane</th><th>Group</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        {% for l in submission.lanes.all %}
+            <tr>
+                <td><a href="{% url 'run' pk=l.run.pk %}">{{l.run.run_date}}</a></td>
+                <td>{{l.lane_number}}</td>
+                <td>{{l.group}}</td>
+                <td>{{l.project_id}}</td>
+                <td>{{l.lane_dir}}</td>
+                <td>{{l.concentration}}</td>
+                <td>{{l.description}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <h3>This submission does not have any associated runs.</h3>
+{% endif %}
 {% endblock %}

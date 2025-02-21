@@ -15,6 +15,8 @@ from django.db import models
 from django.contrib.auth.models import Group, User as AuthUser
 from django.utils import timezone
 
+from coreomics.models import Submission
+
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', models.DO_NOTHING)
@@ -235,6 +237,7 @@ class RunLane(models.Model):
     lane_dir = models.CharField(max_length=40, blank=True, null=True)
     job_id = models.CharField(max_length=50, blank=True, null=True)
     project_id = models.CharField(max_length=50, blank=True, null=True)
+    submission = models.ForeignKey(Submission, models.RESTRICT, null=True, related_name='lanes') # fix character sets or do: alter table coreomics_submission convert to character set latin1;
     @property
     def data_url(self):
         return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)

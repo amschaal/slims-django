@@ -35,13 +35,14 @@ class RunLaneForm(forms.ModelForm):
         # self.fields['lane_number'].la = 'foo'
     class Meta:
         widgets = {
-            'lane_number': forms.NumberInput({'class': 'lane-input'})
+            'lane_number': forms.NumberInput({'class': 'lane-input'}),
+            'group': forms.Select(attrs={'class': 'select2'})
         }
         labels = {
             'lane_number': 'Lane'
         }
         model = RunLane
-        fields = ["lane_number", "group", "project_id", "lane_dir", "concentration", "description"]
+        fields = ["lane_number", "group", "submission", "project_id", "lane_dir", "concentration", "description"]
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 

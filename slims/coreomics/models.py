@@ -13,6 +13,10 @@ class Submission(models.Model):
     url = models.URLField(null=True)
     last_sync = models.DateTimeField(null=True)
     data = models.JSONField(default=dict)
+    class Meta:
+        ordering = ('-submitted',)
+    def __str__(self):
+        return str(self.submitted)[:10] + ': ' + (self.internal_id or self.id)
     def update(self, data=None, commit=True):
         if data:
             self.data = data
