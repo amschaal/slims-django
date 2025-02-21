@@ -2,6 +2,17 @@
 {% block 'content' %}
 <h1 class="title">
     Runs
+    <div class="dropdown">
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Create
+        </a>
+      
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          {% for id, name in run_types %}
+          <li><a class="dropdown-item" href="{% url 'create_run' run_type=id %}">{{name}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
 </h1>
 <table id="runs" class="table table-striped" style="width:100%">
     <thead>

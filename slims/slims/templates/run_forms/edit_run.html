@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block 'head' %}
+<script src="{% static 'select2/js/select2.full.js' %}"></script>
+<link href="{% static 'select2/css/select2.css' %}" rel="stylesheet" />
+<style>
+    .select2-container {
+        width: 80% !important;
+    }
+
+    /* Make the Select2 dropdown more spacious */
+    .select2-container .select2-selection--multiple {
+        min-height: 38px;
+        /* Height of the select box */
+        border: 1px solid #ccc;
+        /* Border color */
+        border-radius: 0.375rem;
+        /* Border radius for rounded corners */
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        padding: 4px;
+        /* Padding inside the selection box */
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        /* Background color for selected items */
+        color: white;
+        /* Text color */
+        border-radius: 5px;
+        /* Rounded corners for selected items */
+    }
+
+    .select2-container .select2-dropdown {
+        border-radius: 0.375rem;
+        /* Match border radius with selection box */
+    }
+
+    /* Customize search box inside the dropdown */
+    .select2-container .select2-search--dropdown .select2-search__field {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}
+{% block 'content' %}
+<h1 class="title">
+    {% if run.pk %}
+        Edit Run
+    {% else %}
+        Create Run
+    {% endif %}
+</h1>
+<form method="POST" action=".">
+    {% csrf_token %}
+    {{ run_form|crispy }}
+    <h2 class="title">Lanes</h2>
+    <div id="lanes-container">
+        {{ lane_formset | crispy }}
+    </div>
+    {% if run.pk %}
+        <a class="btn btn-danger" href="{% url 'run' pk=run.pk%}">Cancel</a>
+    {% endif %}
+    <a class="btn btn-success" id="add-lane">Add Lane</a>
+    <input class="btn btn-primary" type="submit" value="Submit" />
+</form>
+
+<script>
+let currentIndex = {% if run.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
+function create_group_select(elements) {
+    elements.select2({
+            placeholder: "Select group...",
+            minimumInputLength: 2,
+            ajax: {
+                url: '/api/groups',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        name__icontains: params.term,
+                        offset: (params.page || 0) * 10,  // Use pagination with limit/offset
+                        limit: 10
+                    }
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    let results = data.results.map(function (u) { return { id: u.id, text: u.name } })
+                    return {
+                        results: results,  // Your paginated results here
+                        pagination: {
+                            more: data.next != null  // Check if more data is available
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+}
+$(document).ready(function() {
+        let formIndex = $('#lanes-container .multiField').length - 1; // Get the number of current forms
+        
+        $('#add-lane').on('click', function() {
+            var newIndex = currentIndex + 1;
+            // Clone the last form in the formset
+            let newForm = $('#lanes-container .multiField').last().clone();
+            // Reset input values
+            newForm.find('input, textarea, select').val('');
+            // Update the form's IDs, names, and management form fields
+            newForm.find('input, textarea, select').each(function() {
+                let name = $(this).attr('name');
+                name = name.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                $(this).attr('name', name);
+            });
+            newForm.find('[id]').each(function() {
+                let id = $(this).attr('id');
+                id = id.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                $(this).attr('id', id);
+            });
+            newForm.find('[for]').each(function() {
+                let val = $(this).attr('for');
+                val = val.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                $(this).attr('for', val);
+            });
+            newForm.find('.lane_number').html(currentIndex);
+            // Add the new form to the container
+            $('#lanes-container').append(newForm);
+            // create_group_select(newForm.find('.select2'))
+            // Update the management form's total form count
+            currentIndex = newIndex;
+            $('#id_lanes-TOTAL_FORMS').val(newIndex + 1);
+        });
+        create_group_select($('.select2'))
+    });
+</script>
+<style>
+.multiField {
+  display: flex;
+  display: -webkit-flex;
+  align-items: flex-start;
+  -webkit-align-items: flex-start;
+}
+.multiField field {
+    display: inline-block;
+}
+.lane-input {
+    max-width: 80px;
+}
+</style>
+{% endblock %}

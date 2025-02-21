@@ -4,12 +4,13 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from coreomics.models import Submission
+from .run_type import RunTypeRegistry
 from .models import Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
 @user_passes_test(lambda u: u.is_staff)
 def runs(request):
-    return render(request, "runs.html", { })
+    return render(request, "runs.html", { 'run_types': RunTypeRegistry.choices() })
 
 @login_required
 def run(request, pk):
@@ -29,9 +30,9 @@ def delete_run(request, pk):
     return render(request, "run_deleted.html", { "run": run})
 
 @user_passes_test(lambda u: u.is_staff)
-def edit_run(request, pk=None):
+def edit_run(request, pk=None, run_type=None):
     helper = RunLaneHelper()
-    run = Run()
+    run = Run(run_type=run_type)
     if pk:
         run = Run.objects.get(pk=pk)
         if not run.can_modify:
@@ -49,7 +50,7 @@ def edit_run(request, pk=None):
             lane_formset.save()
             return redirect('run', pk=run.pk)
 
-    return render(request, "edit_run.html", { "run_form": run_form, "lane_formset": lane_formset, "run": run, "helper": helper})
+    return render(request, run.run_class.run_form_template, { "run_form": run_form, "lane_formset": lane_formset, "run": run, "helper": helper})
 
 @user_passes_test(lambda u: u.is_staff)
 def users(request):

@@ -11,7 +11,12 @@ class RunForm(forms.ModelForm):
             self.fields[field].required = True
     class Meta:
         model = Run
-        fields = ["run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["run_type", "run_date", "machine", "run_dir", "description", "notes"]
+
+class PacbioRunForm(RunForm):
+    class Meta:
+        model = Run
+        fields = ["description", "machine", "notes"]
 
 # Following helper is not working for some reason.
 class RunLaneHelper(FormHelper):
@@ -33,6 +38,7 @@ class RunLaneForm(forms.ModelForm):
         # if self.instance:
         #     self.fields['lane_number'].disabled = True
         # self.fields['lane_number'].la = 'foo'
+        # self.fields['submission'].queryset = Submission.objects.f
     class Meta:
         widgets = {
             'lane_number': forms.NumberInput({'class': 'lane-input'}),

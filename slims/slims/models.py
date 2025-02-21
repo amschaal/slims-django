@@ -199,8 +199,8 @@ class Run(models.Model):
         return days_old < 90
     @property
     def run_class(self):
-        from .run_type import RunType
-        return RunType(self)
+        from .run_type import RunType, RunTypeRegistry
+        return RunTypeRegistry.get(self.run_type)(self)
     class Meta:
         managed = True
         db_table = 'run'
