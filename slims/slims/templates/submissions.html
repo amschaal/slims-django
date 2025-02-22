@@ -21,6 +21,7 @@
     $(document).ready(function () {
         console.log('Document ready, initializing DataTable...');
         $('#submissions').DataTable({
+            order: [[0, 'desc']],
             columns: [
                 { data: "submitted",
                     render: function (data, type, row) {

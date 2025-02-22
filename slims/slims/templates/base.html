@@ -29,12 +29,11 @@
           <a class="nav-link" href="{% url 'profile' %}">Profile</a>
         </li>
         {% if user.is_staff %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Runs</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'runs' %}">View</a></li>
-            <li><a class="dropdown-item" href="{% url 'create_run' %}">Create</a></li>
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'runs' %}">Runs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'submissions' %}">Submissions</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Administrative</a>

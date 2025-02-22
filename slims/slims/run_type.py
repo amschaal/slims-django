@@ -9,6 +9,7 @@ class  RunType(object):
     _run_form_template = 'run_forms/edit_run.html'
     _run_form = RunForm
     _lane_formset = LaneFormSet
+    _data_directory_templates = ['/share/example/run/{run.run_dir}/{lane.lane_dir}']
     def __init__(self, run=None):
         self.run = run
     @property
@@ -28,7 +29,7 @@ class  RunType(object):
         # return LaneFormSet
         return self._lane_formset
     def get_lane_directories(self, lane):
-        return [lane.lane_dir]
+        return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
 
 
 class IlluminaRun(RunType):

@@ -9,6 +9,9 @@
 {% endif %}
 <h2>General Data</h2>
 <table class="table">
+    {% if run.run_type %}
+    <tr><th>Run Type</th><td>{{run.run_type}}</td></tr>
+    {% endif %}
     <tr><th>Machine</th><td>{{run.machine}}</td></tr>
     <tr><th># Cycles</th><td>{{run.num_cycles}}</td></tr>
     <tr><th>Run Directory</th><td>{{run.run_dir}}</td></tr>
@@ -17,24 +20,27 @@
     <tr><th>Description</th><td>{{run.description}}</td></tr>
     {% if user.is_staff %}<tr><th>Notes</th><td>{{run.notes}}</td></tr>{% endif %}
 </table>
-<h2>Lanes</h2>
+<h2>Pools/Containers</h2>
 <table class="table table-striped">
     <thead>
-        <tr><th>Lane</th><th>Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Organism</th><th>Concentration</th><th>Description</th><th>Controls</th></tr>
+        <tr><th>Container</th><th>Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Organism</th><th>Concentration</th><th>Description</th>{% if user.is_staff%}<th>Data Directories</th>{% endif %}<th>Controls</th></tr>
     </thead>
     <tbody>
         {% for l in lanes %}
             <tr>
                 <td>{{l.lane_number}}</td>
                 <td>{{l.group}}</td>
-                {% if user.is_staff and l.submission %}
-                <td><a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a></td>
+                {% if user.is_staff %}
+                <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
                 {% endif %}
                 <td>{{l.project_id}}</td>
                 <td>{{l.lane_dir}}</td>
                 <td>{{l.organism.name}}</td>
                 <td>{{l.concentration}}</td>
                 <td>{{l.description}}</td>
+                {% if user.is_staff%}
+                    <td>{{l.generate_data_dirs}}</td>
+                {% endif %}
                 <td><a href="{{l.data_url}}" class="btn btn-primary">Data</a></td>
             </tr>
         {% endfor %}

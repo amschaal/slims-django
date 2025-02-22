@@ -8,6 +8,7 @@
 
 #  Must first run: python manage.py migrate slims --fake-initial
 #  Then run: python manage.py migrate slims
+from functools import cached_property
 import random
 import string
 import uuid
@@ -197,7 +198,7 @@ class Run(models.Model):
     def can_modify(self):
         days_old = (timezone.now() - self.submitted).days
         return days_old < 90
-    @property
+    @cached_property
     def run_class(self):
         from .run_type import RunType, RunTypeRegistry
         return RunTypeRegistry.get(self.run_type)(self)
@@ -238,6 +239,8 @@ class RunLane(models.Model):
     job_id = models.CharField(max_length=50, blank=True, null=True)
     project_id = models.CharField(max_length=50, blank=True, null=True)
     submission = models.ForeignKey(Submission, models.RESTRICT, null=True, related_name='lanes') # fix character sets or do: alter table coreomics_submission convert to character set latin1;
+    def generate_data_dirs(self):
+        return self.run.run_class.get_lane_directories(self)
     @property
     def data_url(self):
         return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
@@ -247,7 +250,7 @@ class RunLane(models.Model):
     class Meta:
         managed = True
         db_table = 'run_lane'
-        unique_together = (('run', 'lane_number'),)
+        # unique_together = (('run', 'lane_number'),)
 
 
 class SysRuns(models.Model):
