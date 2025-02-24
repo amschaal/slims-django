@@ -247,11 +247,36 @@ class RunLane(models.Model):
     @staticmethod
     def get_user_lanes(user):
         return RunLane.objects.filter(group__in=user.groups.all())
+    def create_data_dirs(self):
+        self.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
+        directories = self.generate_data_dirs()
+        instances = [LaneData(lane=self, data_path=d, repository_subpath=d.split('/')[-1]) for d in directories]
+        return LaneData.objects.bulk_create(instances)
+    def save(self, **kwargs):
+        status = super().save(**kwargs)
+        self.create_data_dirs()
+        return status
     class Meta:
         managed = True
         db_table = 'run_lane'
         # unique_together = (('run', 'lane_number'),)
 
+class LaneData(models.Model):
+    TRANSFER_COPY = 'COPY'
+    TRANSFER_LINK = 'LINK'
+    TRANSFER_CHOICES = ((TRANSFER_COPY, TRANSFER_COPY), (TRANSFER_LINK, TRANSFER_LINK))
+    STATUS_NEW = 'NEW'
+    STATUS_IN_PROGRESS = 'IN_PROGRESS'
+    STATUS_ERROR = 'ERROR'
+    STATUS_COMPLETE = 'COMPLETE'
+    STATUSES = ((STATUS_NEW, 'New'), (STATUS_IN_PROGRESS, 'Transfer In Progress'), (STATUS_ERROR, 'Error'), (STATUS_COMPLETE, 'Complete'))
+    lane = models.ForeignKey(RunLane, related_name='directories', on_delete=models.CASCADE)
+    data_path = models.CharField(max_length=100)
+    repository_subpath = models.CharField(max_length=100)
+    transfer_type = models.CharField(max_length=10, choices=TRANSFER_CHOICES, default=TRANSFER_LINK)
+    status = models.CharField(max_length=15, choices=STATUSES, default=STATUS_NEW)
+    def __str__(self):
+        return self.data_path
 
 class SysRuns(models.Model):
     run_name = models.CharField(max_length=150, blank=True, null=True)

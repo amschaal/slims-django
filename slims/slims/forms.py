@@ -27,7 +27,6 @@ class RunLaneHelper(FormHelper):
         self.layout = Layout(
             Div('group', css_class='column is-2'), 
             Div('project_id', css_class='column is-3'),
-            Div('concentration', css_class='column is-2'),
             Div('description', css_class='column is-5'),
         )
 
@@ -48,7 +47,7 @@ class RunLaneForm(forms.ModelForm):
             'lane_number': 'Lane'
         }
         model = RunLane
-        fields = ["lane_number", "group", "submission", "project_id", "lane_dir", "concentration", "description"]
+        fields = ["lane_number", "group", "submission", "project_id", "lane_dir", "description"]
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 

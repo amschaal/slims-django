@@ -39,7 +39,7 @@
                 <td>{{l.concentration}}</td>
                 <td>{{l.description}}</td>
                 {% if user.is_staff%}
-                    <td>{{l.generate_data_dirs}}</td>
+                    <td>{{l.generate_data_dirs}} - {{l.directories.all}}</td>
                 {% endif %}
                 <td><a href="{{l.data_url}}" class="btn btn-primary">Data</a></td>
             </tr>
