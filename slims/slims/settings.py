@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'slims',
     'coreomics',
+    'bioshare',
     'rest_framework',
     'django_filters',
     'crispy_forms',
@@ -86,6 +87,9 @@ DATABASES = {
         "PASSWORD": os.environ.get("SQL_PASSWORD"),
         "HOST": os.environ.get("SQL_HOST", "db"),
         "PORT": os.environ.get("SQL_PORT", "3306"),
+        "OPTIONS": {
+            "charset": 'latin1'
+        }
     }
 }
 # Password validation
