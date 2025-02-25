@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from .models import LaneData
 from .forms import RunForm, PacbioRunForm, LaneFormSet
 
 
@@ -9,7 +10,7 @@ class  RunType(object):
     _run_form_template = 'run_forms/edit_run.html'
     _run_form = RunForm
     _lane_formset = LaneFormSet
-    _data_directory_templates = ['/share/example/run/{run.run_dir}/{lane.lane_dir}']
+    _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
     def __init__(self, run=None):
         self.run = run
     @property
@@ -28,8 +29,22 @@ class  RunType(object):
         # from .forms import LaneFormSet
         # return LaneFormSet
         return self._lane_formset
-    def get_lane_directories(self, lane):
-        return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
+    def generate_lane_directories(self, lane):
+        directories = []
+        for t in self._data_directory_templates:
+            data_path = t['data_path'].format(run=self.run, lane=lane)
+            if 'repository_subpath' in t:
+                repository_subpath = t['repository_subpath'].format(run=self.run, lane=lane)
+            else:
+                repository_subpath = data_path.split('/')[-1]
+            directories.append(LaneData(lane=lane, data_path=data_path, repository_subpath=repository_subpath))
+        # instances = [LaneData(lane=lane, data_path=d['data_path'], repository_subpath=d.get('repository_subpath', d['data_path'].split('/')[-1])) for d in directories]
+        return directories
+    def create_lane_directories(self, lane):
+        instances = self.generate_lane_directories(lane)
+        lane.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
+        return LaneData.objects.bulk_create(instances)
+        # return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
 
 
 class IlluminaRun(RunType):

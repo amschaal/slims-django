@@ -240,21 +240,21 @@ class RunLane(models.Model):
     project_id = models.CharField(max_length=50, blank=True, null=True)
     submission = models.ForeignKey(Submission, models.RESTRICT, null=True, related_name='lanes') # fix character sets or do: alter table coreomics_submission convert to character set latin1;
     def generate_data_dirs(self):
-        return self.run.run_class.get_lane_directories(self)
+        return self.run.run_class.generate_lane_directories(self)
     @property
     def data_url(self):
         return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
     @staticmethod
     def get_user_lanes(user):
         return RunLane.objects.filter(group__in=user.groups.all())
-    def create_data_dirs(self):
-        self.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
-        directories = self.generate_data_dirs()
-        instances = [LaneData(lane=self, data_path=d, repository_subpath=d.split('/')[-1]) for d in directories]
-        return LaneData.objects.bulk_create(instances)
+    # def create_data_dirs(self):
+    #     self.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
+    #     directories = self.generate_data_dirs()
+    #     instances = [LaneData(lane=self, data_path=d, repository_subpath=d.split('/')[-1]) for d in directories]
+    #     return LaneData.objects.bulk_create(instances)
     def save(self, **kwargs):
         status = super().save(**kwargs)
-        self.create_data_dirs()
+        self.run.run_class.create_lane_directories(self)
         return status
     class Meta:
         managed = True
