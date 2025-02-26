@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from coreomics.models import Submission
+from bioshare.models import SubmissionShare
 from .run_type import RunTypeRegistry
 from .models import Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
@@ -84,3 +85,11 @@ def submissions(request):
 def submission(request, pk):
     submission = Submission.objects.get(pk=pk)
     return render(request, "submission.html", {"submission": submission})
+
+def create_submission_share(request, pk):
+    submission = Submission.objects.get(pk=pk)
+    if hasattr(submission, 'share'):
+        raise HttpResponseForbidden('This submission already has an associated share.')
+    share = SubmissionShare(submission=submission)
+    share.save()
+    return redirect('submission', pk=pk)

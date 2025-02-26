@@ -17,6 +17,7 @@ services:
       - ./.env.dev
     networks:
       - slims-network
+      - shared-network
     ports:
       - "9876:9876"
     depends_on:
@@ -42,3 +43,5 @@ volumes:
   data_volume:
 networks:
   slims-network:
+  shared-network: #for communicating with other docker application APIs used by plugins.  First run: docker network create shared-network
+    external: true

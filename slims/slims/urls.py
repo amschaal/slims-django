@@ -23,8 +23,6 @@ from slims.api.views import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("submissions/", views.submissions, name="submissions"),
-    path("submissions/<slug:pk>/", views.submission, name="submission"),
     path("runs/", views.runs, name="runs"),
     path("runs/create/<slug:run_type>/", views.edit_run, name="create_run"),
     path("runs/<int:pk>/", views.run, name="run"),
@@ -35,6 +33,9 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("groups/", views.groups, name="groups"),
     path("groups/<int:pk>/", views.group, name="group"),
+    path("submissions/", views.submissions, name="submissions"),
+    path("submissions/<slug:pk>/", views.submission, name="submission"),
+    path("submissions/<slug:pk>/create_share/", views.create_submission_share, name="create_submission_share"),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path("accounts/", include("django.contrib.auth.urls")),

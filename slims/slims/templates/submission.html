@@ -9,6 +9,7 @@
             <tr><th>Submitter</th><td>{{submission.submitter_name}} ({{submission.submitter_email}})</td></tr>
             <tr><th>PI</th><td>{{submission.pi_name}} ({{submission.pi_email}})</td></tr>
             <tr><th>URL</th><td><a href="{{submission.url}}" target="_blank">{{submission.url}}</a></td></tr>
+            <tr><th>Share</th><td>{% if submission.share %}{{submission.share}}{% else %}<a class="btn btn-primary" href="{% url 'create_submission_share' pk=submission.pk %}">Create</a>{% endif %}</td></tr>
         </table>
     </div>
 </div>
