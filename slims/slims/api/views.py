@@ -2,8 +2,9 @@ from django.urls import path, include
 from django.contrib.auth.models import User, Group
 from django.db.models import Count
 from coreomics.models import Submission
+from bioshare.models import SubmissionShare
 from slims.models import Run, RunLane
-from .serializers import UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer
+from .serializers import BioshareSerializer, UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer
 from rest_framework import routers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -55,6 +56,7 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
         return RunLane.get_user_lanes(user)
     serializer_class = RunLaneSerializer
     # ordering_fields = ['run__run_date', 'machine', 'submitted', 'run_type', 'num_cycles', 'run_dir']
+    filterset_fields = { 'submission__id':['exact'], 'submission__internal_id':['exact']}
     ordering = ['-run__run_date', 'run__run_id']
     search_fields = ['run__run_date', 'run__machine', 'run__submitted', 'run__run_type', 'run__description', 'description', 'lane_number', 'group__name']
 
@@ -65,6 +67,12 @@ class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-submitted']
     search_fields = ['internal_id', 'id', 'submitter_name', 'pi_name', 'submitter_email', 'pi_email', 'submission_type']
 
+class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = SubmissionShare.objects.all()
+    serializer_class = BioshareSerializer
+    search_fields = ['internal_id', 'id', 'submitter_name', 'pi_name', 'submitter_email', 'pi_email', 'submission_type']
+
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -72,3 +80,4 @@ router.register(r'groups', GroupViewSet)
 router.register(r'runs', RunViewSet)
 router.register(r'profile_lanes', RunLaneProfileViewSet, 'profile_lanes')
 router.register(r'submissions', SubmissionViewSet)
+router.register(r'submission_shares', BioshareViewSet)

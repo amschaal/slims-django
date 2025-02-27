@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Group
 from coreomics.models import Submission
+from bioshare.models import SubmissionShare
 from slims.models import Run, RunLane
 from rest_framework import serializers
 
@@ -25,7 +26,7 @@ class GroupDetailSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     is_pi = serializers.SerializerMethodField()
-    def is_pi(self, instance):
+    def get_is_pi(self, instance):
         return instance.is_pi()
     class Meta:
         model = User
@@ -50,3 +51,11 @@ class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
         exclude = ['data']
+
+class BioshareSerializer(serializers.ModelSerializer):
+    # name = serializers.SerializerMethodField()
+    # def get_name(self, instance):
+    #     return instance.name
+    class Meta:
+        model = SubmissionShare
+        fields = ['name', 'notes', 'permissions', 'updated']
