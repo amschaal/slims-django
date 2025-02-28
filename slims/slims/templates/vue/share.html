@@ -1,24 +1,26 @@
-<div id="app">[[share]]
+<div id="app">
     <div class="card mt-2" style="width: 100%;">
         <div class="card-body">
             <h3 class="card-title">Share</h3>
             <div v-if="id && share">
-                [[id]]
-                [[share]]
+                <!-- [[id]]
+                [[share]] -->
                 <table class="table">
                     <tr><th>Name</th><td>[[share.name]]</td></tr>
                     <tr><th>Description</th><td>[[share.notes]]</td></tr>
                     <tr><th>URL</th><td><a :href="share.url" target="_blank">[[share.url]]</a></td></tr>
+                    <tr><th>Last updated</th><th>{{share.updated}}</th></tr>
                 </table>
-                [[share.permissions.user_perms]]
+                <!-- [[share.permissions.user_perms]] -->
+                 <button class="btn btn-primary" @click="shareWithClients">Share with clients</button>
                  <table class="table">
-                    <thead><tr><th>User/Group</th><th>Permissions</th></tr></thead>
+                    <thead><tr><th>User/Group</th><th>Source</th><th>Permissions</th></tr></thead>
                     <tbody>
-                        <tr v-for="(up, email) in share.permissions.user_perms" :key="email"><td>[[email]]</td><td>[[up.permissions]]</td></tr><tr></tr>
+                        <tr v-for="u in users" :key="email"><td>[[u.email]] <span v-if="u.name">([[u.name]])</span></td><td>[[u.source]]</td><td><span v-if="u.permissions">[[u.permissions.permissions]]</span><i v-else class="fa-solid fa-xmark" style="color: red;"></i></td></tr><tr></tr>
                     </tbody>
                 </table>
-                <i class="fa-solid fa-check"></i>permissions: {{submission.share.permissions}}
-                updated: {{share.updated}}
+                <!-- <i class="fa-solid fa-check"></i> -->
+                <!-- users: [[users]] -->
             </div>
             <div v-else>
                 This submission does not yet have a share. <a class="btn btn-primary" href="{% url 'create_submission_share' pk=submission.pk %}">Create</a> a share.
@@ -47,7 +49,28 @@
         }
       },
       methods: {
-
+        shareWithClients () {
+            axios.post(`/api/submission_shares/${this.id}/share_with_clients/`, {}, axios_headers).then(response => {
+                this.share = response.data
+                alert('Successfully shared with clients.')
+            })
+        }
+      },
+      computed: {
+        users () {
+            let users = this.share.submission.participants.map(u => {
+                return { name: `${u.last_name}, ${u.first_name}`, email: u.email, source: 'Participants'}
+            })
+            users.push({name: this.share.submission.pi_name, email: this.share.submission.pi_email, source: 'PI'});
+            users.push({name: this.share.submission.submitter_name, email: this.share.submission.submitter_email, source: 'Submitter'});
+            this.share.submission.contacts.forEach(c => {
+                users.push({name: `${c.last_name}, ${c.first_name}`, email: c.email, source: 'Contacts'})
+            });
+            users.forEach(u => {
+                u.permissions = this.share.permissions.user_perms[u.email]
+            })
+            return users
+        }
       }
     }).mount('#app')
   </script>

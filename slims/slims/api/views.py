@@ -70,7 +70,11 @@ class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
 class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SubmissionShare.objects.all()
     serializer_class = BioshareSerializer
-    search_fields = ['internal_id', 'id', 'submitter_name', 'pi_name', 'submitter_email', 'pi_email', 'submission_type']
+    @action(detail=True, methods=['post'])
+    def share_with_clients(self, request, pk=None):
+        share = self.get_object()
+        share.share()
+        return Response(BioshareSerializer(share).data)
 
 
 # Routers provide an easy way of automatically determining the URL conf.

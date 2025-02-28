@@ -48,14 +48,19 @@ class RunLaneSerializer(serializers.ModelSerializer):
         exclude = []
 
 class SubmissionSerializer(serializers.ModelSerializer):
+    contacts = serializers.SerializerMethodField()
+    participants = serializers.SerializerMethodField()
+    def get_contacts(self, instance):
+        return instance.data.get('contacts',[])
+    def get_participants(self, instance):
+        return instance.data.get('participants',[])
     class Meta:
         model = Submission
         exclude = ['data']
 
 class BioshareSerializer(serializers.ModelSerializer):
-    # name = serializers.SerializerMethodField()
-    # def get_name(self, instance):
-    #     return instance.name
+    submission = SubmissionSerializer()
+    # participants = 
     class Meta:
         model = SubmissionShare
-        fields = ['name', 'notes', 'permissions', 'updated']
+        fields = ['name', 'notes', 'permissions', 'updated', 'url', 'submission', 'bioshare_id']
