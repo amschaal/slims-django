@@ -9,13 +9,14 @@
                     <tr><th>Name</th><td>[[share.name]]</td></tr>
                     <tr><th>Description</th><td>[[share.notes]]</td></tr>
                     <tr><th>URL</th><td><a :href="share.url" target="_blank">[[share.url]]</a></td></tr>
-                    <tr><th>Last updated</th><th>{{share.updated}}</th></tr>
+                    <tr><th>Last updated</th><td>[[share.updated]]</td></tr>
                 </table>
                 <!-- [[share.permissions.user_perms]] -->
                  <button class="btn btn-primary" @click="shareWithClients">Share with clients</button>
                  <table class="table">
                     <thead><tr><th>User/Group</th><th>Source</th><th>Permissions</th></tr></thead>
                     <tbody>
+                        <tr v-for="g in share.permissions.group_perms"><td>Group: "[[g.group.name]]"</td><td>Group Permissions</td><td>[[g.permissions]]</td></tr>
                         <tr v-for="u in users" :key="email"><td>[[u.email]] <span v-if="u.name">([[u.name]])</span></td><td>[[u.source]]</td><td><span v-if="u.permissions">[[u.permissions.permissions]]</span><i v-else class="fa-solid fa-xmark" style="color: red;"></i></td></tr><tr></tr>
                     </tbody>
                 </table>

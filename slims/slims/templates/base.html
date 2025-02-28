@@ -5,20 +5,20 @@
   <title>SLIMS</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet">
-  <script src="{% static 'bootstrap/js/bootstrap.bundle.js' %}"></script>
+  <link href="{% static 'bootstrap/bootstrap.css' %}" rel="stylesheet">
+  <script src="{% static 'bootstrap/bootstrap.bundle.js' %}"></script>
   <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
   <script src="{% static 'DataTables/datatables.js' %}"></script>
   <script src="{% static 'moment.min.js' %}"></script>
   <script src="{% static 'axios/axios.min.js' %}"></script>
   <link href="{% static 'fontawesome/css/all.min.css' %}" rel="stylesheet">
   <script>
-    const axios_headers = {"X-CSRFTOKEN": "{{csrf_token}}"};
+    const axios_headers = { headers: {"X-CSRFTOKEN": "{{csrf_token}}"} };
   </script>
-  {% block 'head' %}{% endblock %}
+  <script src="{% static 'vue.global.js' %}"></script>
+{% block 'head' %}{% endblock %}
 </head>
 <body>
-<script src="{% static 'vue.global.js' %}"></script>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container-fluid">
     <a class="navbar-brand">
