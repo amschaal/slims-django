@@ -1,0 +1,53 @@
+<div id="app">[[share]]
+    <div class="card mt-2" style="width: 100%;">
+        <div class="card-body">
+            <h3 class="card-title">Share</h3>
+            <div v-if="id && share">
+                [[id]]
+                [[share]]
+                <table class="table">
+                    <tr><th>Name</th><td>[[share.name]]</td></tr>
+                    <tr><th>Description</th><td>[[share.notes]]</td></tr>
+                    <tr><th>URL</th><td><a :href="share.url" target="_blank">[[share.url]]</a></td></tr>
+                </table>
+                [[share.permissions.user_perms]]
+                 <table class="table">
+                    <thead><tr><th>User/Group</th><th>Permissions</th></tr></thead>
+                    <tbody>
+                        <tr v-for="(up, email) in share.permissions.user_perms" :key="email"><td>[[email]]</td><td>[[up.permissions]]</td></tr><tr></tr>
+                    </tbody>
+                </table>
+                <i class="fa-solid fa-check"></i>permissions: {{submission.share.permissions}}
+                updated: {{share.updated}}
+            </div>
+            <div v-else>
+                This submission does not yet have a share. <a class="btn btn-primary" href="{% url 'create_submission_share' pk=submission.pk %}">Create</a> a share.
+            </div>
+        </div>
+    </div>
+</div>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      el: '#app',
+      delimiters: ['[[', ']]'],
+      data() {
+        return {
+            id: "{{submission.share.id}}",
+            share: null,
+            submission_id: "{{submission.id}}"
+            // permissions: {{submission.share.permissions|escapejs}}
+            };
+        },
+      mounted () {
+        if (this.id) {
+            axios.get(`/api/submission_shares/${this.id}/`).then(response =>
+                this.share = response.data
+            )
+        }
+      },
+      methods: {
+
+      }
+    }).mount('#app')
+  </script>
