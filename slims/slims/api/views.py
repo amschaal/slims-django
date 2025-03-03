@@ -4,7 +4,7 @@ from django.db.models import Count
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
 from slims.models import Run, RunLane
-from .serializers import BioshareSerializer, UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer
+from .serializers import BioshareSerializer, UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer, RunLaneDetailSerializer
 from rest_framework import routers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -60,6 +60,12 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-run__run_date', 'run__run_id']
     search_fields = ['run__run_date', 'run__machine', 'run__submitted', 'run__run_type', 'run__description', 'description', 'lane_number', 'group__name']
 
+class RunLaneViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = RunLaneDetailSerializer
+    queryset = RunLane.objects.all()
+    filterset_fields = { 'submission__id':['exact'], 'submission__internal_id':['exact'], 'run':['exact']}
+    ordering = ['-run__run_date', 'run__run_id', 'lane_number']
+
 class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
@@ -83,5 +89,6 @@ router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'runs', RunViewSet)
 router.register(r'profile_lanes', RunLaneProfileViewSet, 'profile_lanes')
+router.register(r'run_lanes', RunLaneViewSet, 'run_lanes')
 router.register(r'submissions', SubmissionViewSet)
 router.register(r'submission_shares', BioshareViewSet)

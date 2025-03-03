@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
-from slims.models import Run, RunLane
+from slims.models import Run, RunLane, LaneData
 from rest_framework import serializers
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -46,6 +46,14 @@ class RunLaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = RunLane
         exclude = []
+
+class LaneData(serializers.ModelSerializer):
+    class Meta:
+        model = LaneData
+        exclude = []
+
+class RunLaneDetailSerializer(RunLaneSerializer):
+    directories = LaneData(many=True, read_only=True)
 
 class SubmissionSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
