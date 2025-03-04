@@ -1,0 +1,60 @@
+<div id="lanes">
+    <div class="card mt-2" style="width: 100%;">
+        <div class="card-body">
+            <h3 class="card-title">Lanes</h3>
+            [[lanes]]
+            [[selected]]
+            <table class="table table-striped">
+                <thead>
+                    <tr><th>Run Date</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
+                </thead>
+                <tbody>
+                        <tr v-for="l in lanes">
+                            <td><a :href="`/runs/${l.run.run_id}/`">[[l.run.run_date ]]</a></td>
+                            <td>[[l.lane_number]]</td>
+                            <td>[[l.project_id]]</td>
+                            <td>[[l.lane_dir]]</td>
+                            <td>[[l.concentration]]</td>
+                            <td>[[l.description]]</td>
+                            <td><span v-for="d in l.directories"><label><input type="checkbox" v-model="selected" :value="d.id"/> [[ directories[d.id].repository_subpath ]]</label> </span></td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+  <script>
+    // const { createApp } = Vue;
+    createApp({
+      delimiters: ['[[', ']]'],
+      data() {
+        return {
+            submission_id: "{{submission.id}}",
+            lanes: null,
+            directories: {},
+            selected: []
+            };
+        },
+      mounted () {
+        axios.get(`/api/run_lanes/?submission__id=${this.submission_id}`).then(response => {
+            console.log('lanes', response.data)
+            this.lanes = response.data.results
+            this.lanes.forEach(l => {
+                l.directories.forEach(d => {
+                    this.directories[d.id] = d
+                })
+            });
+        })
+      },
+      methods: {
+        shareWithClients () {
+            axios.post(`/api/submission_shares/${this.id}/share_with_clients/`, {}, axios_headers).then(response => {
+                this.share = response.data
+                alert('Successfully shared with clients.')
+            })
+        }
+      },
+      computed: {
+      }
+    }).mount('#lanes')
+  </script>
