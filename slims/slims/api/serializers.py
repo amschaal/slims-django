@@ -47,13 +47,13 @@ class RunLaneSerializer(serializers.ModelSerializer):
         model = RunLane
         exclude = []
 
-class LaneData(serializers.ModelSerializer):
+class LaneDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaneData
         exclude = []
 
 class RunLaneDetailSerializer(RunLaneSerializer):
-    directories = LaneData(many=True, read_only=True)
+    directories = LaneDataSerializer(many=True, read_only=True)
 
 class SubmissionSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()

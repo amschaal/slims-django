@@ -1,8 +1,8 @@
 import re
-import urllib, json
+import urllib.request, json
 from django.conf import settings
-from .config import CREATE_URL, GET_URL
-def bioshare_request(url, token, data=None):
+from .config import CREATE_URL, GET_URL, AUTH_TOKEN, SYMLINK_URL
+def bioshare_request(url, token=AUTH_TOKEN, data=None):
     print('bioshare url', url, 'token', token)
     params = json.dumps(data).encode('utf8')
     if data:
@@ -29,19 +29,24 @@ def parse_share_id(url):
         return None
     return matches[1]
 
-def bioshare_post(url, token, data):
-    return bioshare_request(url, token, data)
+def bioshare_post(url, data):
+    return bioshare_request(url, AUTH_TOKEN, data)
 
-def bioshare_get(url, token):
-    return bioshare_request(url, token)
+def bioshare_get(url):
+    return bioshare_request(url, AUTH_TOKEN)
 
-def get_share(token, id):
+def get_share(id):
     url = GET_URL.format(id=id)
-    return bioshare_get(url, token)
+    return bioshare_get(url)
 
-def create_share(token, name, description=None, filesystem=None):
+def create_share(name, description=None, filesystem=None):
         description = description or 'Genome Center LIMS generated share'
         params = {"name":name,"notes":description,'read_only':False}
         if filesystem:
             params['filesystem'] = filesystem
-        return bioshare_post(CREATE_URL, token, params)['id']
+        return bioshare_post(CREATE_URL, params)['id']
+
+def link_data(share_id, target, share_path):
+        url = SYMLINK_URL.format(id=share_id)
+        params = {"name":share_path,"target":target}
+        return bioshare_post(url, params)

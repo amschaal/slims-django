@@ -1,5 +1,5 @@
 from django.db import models
-from .config import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP, AUTH_TOKEN
+from .config import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP
 from coreomics.models import Submission
 from .requests import bioshare_post, bioshare_get, create_share
 from django.utils import timezone
@@ -23,7 +23,7 @@ class SubmissionShare(models.Model):
             # name = self.name or '{}: {}'.format(self.submission.pi_name,self.submission.internal_id)
             # notes = self.notes or 
             filesystem = FILESYSTEM_ID
-            self.bioshare_id = create_share(AUTH_TOKEN, self.name, self.notes, filesystem)
+            self.bioshare_id = create_share(self.name, self.notes, filesystem)
         if not self.id:
             self.id = '{}_{}'.format(self.submission.pk, self.bioshare_id)
         instance = super(SubmissionShare, self).save(*args, **kwargs)
@@ -40,7 +40,7 @@ class SubmissionShare(models.Model):
 #             perms = {"test": True, "groups": {}, "users":dict([(p.email,["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]) for p in self.submission.participants.all()]), "email":True}
 #         print('perms', perms)
 #       perms = {"users":{"jdoe@domain.com":["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]},"groups":{"1":["view_share_files","download_share_files","write_to_share"]},"email":true}
-        perms = bioshare_post(SET_PERMISSIONS_URL.format(id=self.bioshare_id), AUTH_TOKEN, perms)
+        perms = bioshare_post(SET_PERMISSIONS_URL.format(id=self.bioshare_id), perms)
         if not self.permissions:
             self.permissions = {}
         self.permissions['user_perms'] = perms['user_perms']
@@ -68,4 +68,4 @@ class SubmissionShare(models.Model):
         self.updated = timezone.now()
         self.save()
     def get_permissions(self):
-        return bioshare_get(GET_PERMISSIONS_URL.format(id=self.bioshare_id), AUTH_TOKEN)
+        return bioshare_get(GET_PERMISSIONS_URL.format(id=self.bioshare_id))
