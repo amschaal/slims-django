@@ -1,7 +1,7 @@
 from django.db import models
 from .config import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP
 from coreomics.models import Submission
-from .requests import bioshare_post, bioshare_get, create_share
+from .requests import bioshare_post, bioshare_get, create_share, link_data
 from django.utils import timezone
 
 class SubmissionShare(models.Model):
@@ -67,5 +67,7 @@ class SubmissionShare(models.Model):
         self.permissions = self.get_permissions()
         self.updated = timezone.now()
         self.save()
+    def link(self, target, share_path):
+        return link_data(self.bioshare_id, target, share_path)
     def get_permissions(self):
         return bioshare_get(GET_PERMISSIONS_URL.format(id=self.bioshare_id))

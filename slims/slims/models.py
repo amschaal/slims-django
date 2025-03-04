@@ -275,6 +275,18 @@ class LaneData(models.Model):
     repository_subpath = models.CharField(max_length=100)
     transfer_type = models.CharField(max_length=10, choices=TRANSFER_CHOICES, default=TRANSFER_LINK)
     status = models.CharField(max_length=15, choices=STATUSES, default=STATUS_NEW)
+    def share(self):
+        if self.transfer_type == LaneData.TRANSFER_LINK:
+            try:
+                data = self.lane.submission.share.link(self.data_path, self.repository_subpath)
+                if data['status'] == 'success':
+                    self.status = LaneData.STATUS_COMPLETE
+                else:
+                    self.status = LaneData.STATUS_ERROR
+            except:
+                self.status = LaneData.STATUS_ERROR
+            self.save()
+
     def __str__(self):
         return self.data_path
 

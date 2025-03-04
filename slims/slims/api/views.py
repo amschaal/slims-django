@@ -70,6 +70,11 @@ class LaneDataViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LaneDataSerializer
     queryset = LaneData.objects.all()
     filterset_fields = { 'lane__submission__id':['exact'], 'lane__submission__internal_id':['exact'], 'lane__run':['exact']}
+    @action(detail=True, methods=['post'])
+    def share(self, request, pk=None):
+        instance = self.get_object()
+        instance.share()
+        return Response(LaneDataSerializer(instance).data)
 
 class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Submission.objects.all()
