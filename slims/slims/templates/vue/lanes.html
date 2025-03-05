@@ -2,31 +2,64 @@
     <div class="card mt-2" style="width: 100%;">
         <div class="card-body">
             <h3 class="card-title">Lanes</h3>
-            [[lanes]]
-            [[selected]]
+            <!-- [[lanes]]-->
+            [[selected]] 
+            <button class="btn btn-primary" @click="shareSelectedData">Share Selected</button>
             <table class="table table-striped">
                 <thead>
                     <tr><th>Run Date</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
                 </thead>
                 <tbody>
                         <tr v-for="l in lanes">
-                            <td><a :href="`/runs/${l.run.run_id}/`">[[l.run.run_date ]]</a></td>
+                            <td><a :href="`/runs/${l.run.run_id}/`">[[l.run.run_date || 'No run date' ]]</a></td>
                             <td>[[l.lane_number]]</td>
                             <td>[[l.project_id]]</td>
                             <td>[[l.lane_dir]]</td>
                             <td>[[l.concentration]]</td>
                             <td>[[l.description]]</td>
-                            <td><span v-for="d in l.directories"><label><input type="checkbox" v-model="selected" :value="d.id"/> [[ directories[d.id].repository_subpath ]]</label> </span></td>
+                            <td><span v-for="d in l.directories"><label><input type="checkbox" v-model="selected" :value="d.id" v-if="directories[d.id].can_share"/><directory :directory="directories[d.id]"/></label></td>
                         </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+<template id="directory-template">
+    <span>[[ directory.repository_subpath ]] -> [[ directory.data_path ]], <b>Status:</b> <span :class="getStatusClass(directory.status)">[[directory.status]]</span> <i>[[directory.message]]</i></span>
+</template>
+<script>
+    const Directory = {
+      template: '#directory-template',
+      delimiters: ['[[', ']]'],
+      props: ['directory'],
+      data() {
+        return {
+            test: "Test data"
+            };
+        },
+      methods: {
+        getStatusClass(status) {
+            switch (status.toLowerCase()) {
+                case 'complete':
+                    return 'text-success';
+                case 'error':
+                    return 'text-danger';
+                case 'new':
+                    return 'text-primary';
+                default:
+                    return ''
+            }
+        }
+    }
+    };
+</script>
+
   <script>
-    // const { createApp } = Vue;
     createApp({
       delimiters: ['[[', ']]'],
+      components: {
+        directory: Directory
+      },
       data() {
         return {
             submission_id: "{{submission.id}}",
@@ -51,6 +84,17 @@
             axios.post(`/api/submission_shares/${this.id}/share_with_clients/`, {}, axios_headers).then(response => {
                 this.share = response.data
                 alert('Successfully shared with clients.')
+            })
+        },
+        shareSelectedData () {
+            this.selected.forEach(id => {
+                if (this.directories[id] && this.directories[id].can_share) {
+                    axios.post(`/api/lane_data/${id}/share/`, {}, axios_headers).then(response => {
+                        this.directories[id] = response.data
+                        this.selected.splice(this.selected.indexOf(id), 1)
+                    })
+                }
+                
             })
         }
       },
