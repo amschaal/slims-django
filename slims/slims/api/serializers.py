@@ -48,6 +48,7 @@ class RunLaneSerializer(serializers.ModelSerializer):
         exclude = []
 
 class LaneDataSerializer(serializers.ModelSerializer):
+    can_share = serializers.BooleanField(read_only=True)
     class Meta:
         model = LaneData
         exclude = []
