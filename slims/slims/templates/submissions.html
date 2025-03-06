@@ -41,7 +41,16 @@
                 {
                     data: 'id',
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>'
+                        return '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>';
+                    }
+                },
+                {
+                    data: 'id',
+                    render: function (data, type, row) {
+                        if (row.share && row.share.url) {
+                            return '<a class="btn btn-primary" href="'+row.share.url+'">Share</a>';
+                        }
+                        return '';
                     }
                 }
             ],

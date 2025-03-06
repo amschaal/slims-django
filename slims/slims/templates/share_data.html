@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<div class="card mt-2">
+    <div class="card-body">
+        <h3 class="card-title">Sharing data from {% if submission_id %}submission{% else %}run{% endif %}</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Submission</th><th>Run</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for d in data %}
+                    <tr>
+                        <td><a href="{% url 'submission' pk=d.lane.submission.pk %}">{{d.lane.submission}}</a></td>
+                        <td><a href="{% url 'run' pk=d.lane.run.pk %}">{{d.lane.run}}</a></td>
+                        <td>{{d.lane.lane_number}}</td>
+                        <td>{{d.lane.project_id}}</td>
+                        <td>{{d.lane.lane_dir}}</td>
+                        <td>{{d.data_path}}</td>
+                        <td>{{d.repository_subpath}}</td>
+                        <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
+                        <td><span class="status-{{d.status}}">{{d.status}}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if shares_created|length > 0 %}
+
+    The following shares have been created: 
+    {% for s in shares_created %}
+        <a href="{{s.url}}" target="_blank">{{s}}</a> 
+    {% endfor %}
+{% endif %}
+Return to 
+{% if submission_id %}
+<a href="{% url 'submission' pk=submission_id%}">Submission</a>
+{% elif run_id %}
+<a href="{% url 'run' pk=run_id%}">Run</a>
+{% endif %}
+{% endblock %}

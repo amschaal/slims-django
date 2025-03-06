@@ -63,7 +63,7 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
 class RunLaneViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RunLaneDetailSerializer
     queryset = RunLane.objects.all()
-    filterset_fields = { 'submission__id':['exact'], 'submission__internal_id':['exact'], 'run':['exact']}
+    filterset_fields = { 'submission':['exact'], 'submission__internal_id':['exact'], 'run':['exact']}
     ordering = ['-run__run_date', 'run__run_id', 'lane_number']
 
 class LaneDataViewSet(viewsets.ReadOnlyModelViewSet):

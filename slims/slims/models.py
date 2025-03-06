@@ -202,6 +202,8 @@ class Run(models.Model):
     def run_class(self):
         from .run_type import RunType, RunTypeRegistry
         return RunTypeRegistry.get(self.run_type)(self)
+    def __str__(self):
+        return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.machine or ''))
     class Meta:
         managed = True
         db_table = 'run'
@@ -230,7 +232,7 @@ class RunLane(models.Model):
     organism = models.ForeignKey(Organism, models.DO_NOTHING, blank=True, null=True)
     concentration = models.FloatField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    random_dir = models.CharField(unique=True, max_length=15, blank=True, null=True, default=generate_random_string)
+    random_dir = models.CharField(unique=True, max_length=15, blank=True, null=True)
     delete_analysis_permitted = models.DateTimeField(blank=True, null=True)
     delete_images_permitted = models.DateTimeField(blank=True, null=True)
     images_deleted_by = models.IntegerField(blank=True, null=True)
@@ -243,7 +245,10 @@ class RunLane(models.Model):
         return self.run.run_class.generate_lane_directories(self)
     @property
     def data_url(self):
-        return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
+        if self.submission and self.submission.share:
+            return self.submission.share.url
+        elif self.random_dir:
+            return 'http://slimsdata.genomecenter.ucdavis.edu/Data/{}/'.format(self.random_dir)
     @staticmethod
     def get_user_lanes(user):
         return RunLane.objects.filter(group__in=user.groups.all())
@@ -275,18 +280,29 @@ class LaneData(models.Model):
     repository_subpath = models.CharField(max_length=100)
     transfer_type = models.CharField(max_length=10, choices=TRANSFER_CHOICES, default=TRANSFER_LINK)
     status = models.CharField(max_length=15, choices=STATUSES, default=STATUS_NEW)
+    message = models.TextField(null=True)
     def share(self):
+        if not self.can_share:
+            return False
         if self.transfer_type == LaneData.TRANSFER_LINK:
             try:
                 data = self.lane.submission.share.link(self.data_path, self.repository_subpath)
                 if data['status'] == 'success':
                     self.status = LaneData.STATUS_COMPLETE
+                    self.message = 'Linking complete'
                 else:
                     self.status = LaneData.STATUS_ERROR
+                    if 'errors' in data:
+                        self.message = str(data['errors'])
             except:
                 self.status = LaneData.STATUS_ERROR
+                self.message = 'There was an error linking'
             self.save()
-
+            return True
+        return False
+    @property
+    def can_share(self):
+        return self.status in [LaneData.STATUS_NEW, LaneData.STATUS_ERROR]
     def __str__(self):
         return self.data_path
 

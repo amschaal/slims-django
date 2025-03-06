@@ -34,6 +34,7 @@ class RunLaneForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows']=2
+        self.fields['lane_number'].required = True
         # if self.instance:
         #     self.fields['lane_number'].disabled = True
         # self.fields['lane_number'].la = 'foo'

@@ -31,7 +31,8 @@ class SubmissionShare(models.Model):
         # self.share_with_participants()
         # self.share_with_group_and_participants()
         return instance
-        
+    def __str__(self):
+        return self.name
     @property
     def url(self):
         return VIEW_URL.format(id=self.bioshare_id)

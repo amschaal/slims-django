@@ -53,12 +53,24 @@ class LaneDataSerializer(serializers.ModelSerializer):
         model = LaneData
         exclude = []
 
+class BasicSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['id', 'internal_id', 'pi_name', 'submitted']
+
 class RunLaneDetailSerializer(RunLaneSerializer):
     directories = LaneDataSerializer(many=True, read_only=True)
+    submission = BasicSubmissionSerializer(read_only=True)
+
+class BasicBioshareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmissionShare
+        fields = ['name', 'url']
 
 class SubmissionSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     participants = serializers.SerializerMethodField()
+    share = BasicBioshareSerializer(read_only=True)
     def get_contacts(self, instance):
         return instance.data.get('contacts',[])
     def get_participants(self, instance):

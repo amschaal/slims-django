@@ -35,3 +35,12 @@ class Submission(models.Model):
         submission = Submission(id=serialized['id'], submitted=serialized['submitted'])
         submission.update(serialized, commit=True)
         return submission
+    def create_share(self):
+        from bioshare.models import SubmissionShare
+        if hasattr(self, 'share'):
+            return self.share
+        share = SubmissionShare(submission=self)
+        share.save()
+        # share.update_permissions()
+        share.share_with_group_and_participants()
+        return share

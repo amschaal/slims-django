@@ -7,11 +7,12 @@
             <button class="btn btn-primary" @click="shareSelectedData">Share Selected</button>
             <table class="table table-striped">
                 <thead>
-                    <tr><th>Run Date</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
+                    <tr><th v-if="submission_id">Run Date</th><th v-if="run_id">Submission</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
                 </thead>
                 <tbody>
                         <tr v-for="l in lanes">
-                            <td><a :href="`/runs/${l.run.run_id}/`">[[l.run.run_date || 'No run date' ]]</a></td>
+                            <td v-if="submission_id"><a :href="`/runs/${l.run.run_id}/`">[[l.run.run_date || 'No run date' ]]</a></td>
+                            <td v-if="run_id && l.submission && l.submission"><a :href="`/submissions/${l.submission.id}/`">[[l.submission.internal_id || l.submission.id ]]</a></td><td v-else>None</td>
                             <td>[[l.lane_number]]</td>
                             <td>[[l.project_id]]</td>
                             <td>[[l.lane_dir]]</td>
@@ -62,14 +63,15 @@
       },
       data() {
         return {
-            submission_id: "{{submission.id}}",
+            run_id: {% if run %}{{run.run_id}}{% else %}null{% endif %},
+            submission_id: {% if submission %}"{{submission.id}}"{% else %}null{% endif %},
             lanes: null,
             directories: {},
             selected: []
             };
         },
       mounted () {
-        axios.get(`/api/run_lanes/?submission__id=${this.submission_id}`).then(response => {
+        axios.get(`/api/run_lanes/?${this.query}`).then(response => {
             console.log('lanes', response.data)
             this.lanes = response.data.results
             this.lanes.forEach(l => {
@@ -80,12 +82,6 @@
         })
       },
       methods: {
-        shareWithClients () {
-            axios.post(`/api/submission_shares/${this.id}/share_with_clients/`, {}, axios_headers).then(response => {
-                this.share = response.data
-                alert('Successfully shared with clients.')
-            })
-        },
         shareSelectedData () {
             this.selected.forEach(id => {
                 if (this.directories[id] && this.directories[id].can_share) {
@@ -99,6 +95,9 @@
         }
       },
       computed: {
+        query () {
+            return this.submission_id ? `submission=${this.submission_id}` : `run=${this.run_id}`;
+        }
       }
     }).mount('#lanes')
   </script>

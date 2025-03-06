@@ -1,0 +1,9 @@
+.status-NEW {
+    color: blue;
+}
+.status-ERROR {
+    color: red;
+}
+.status-COMPLETE {
+    color: green;
+}

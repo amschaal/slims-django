@@ -12,6 +12,7 @@
   <script src="{% static 'moment.min.js' %}"></script>
   <script src="{% static 'axios/axios.min.js' %}"></script>
   <link href="{% static 'fontawesome/css/all.min.css' %}" rel="stylesheet">
+  <link href="{% static 'main.css' %}" rel="stylesheet">
   <script>
     const axios_headers = { headers: {"X-CSRFTOKEN": "{{csrf_token}}"} };
   </script>
@@ -19,6 +20,9 @@
 {% block 'head' %}{% endblock %}
 </head>
 <body>
+  <script>
+    const { createApp } = Vue;
+  </script>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container-fluid">
     <a class="navbar-brand">

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
 from .run_type import RunTypeRegistry
-from .models import Run, RunLane
+from .models import LaneData, Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
 @user_passes_test(lambda u: u.is_staff)
@@ -84,12 +84,26 @@ def submissions(request):
 @user_passes_test(lambda u: u.is_staff)
 def submission(request, pk):
     submission = Submission.objects.get(pk=pk)
+    if hasattr(submission,'share'):
+        submission.share.share_with_group_and_participants()
     return render(request, "submission.html", {"submission": submission})
 
+@user_passes_test(lambda u: u.is_staff)
+def share_data(request, submission_id=None, run_id=None):
+    if submission_id:
+        data = LaneData.objects.filter(lane__submission_id=submission_id)
+    elif run_id:
+        data = LaneData.objects.filter(lane__run_id=run_id)
+    shares_created = []
+    for d in data:
+        d.status_before = d.status
+        if not hasattr(d.lane.submission, 'share'):
+            shares_created.append(d.lane.submission.create_share())
+        d.share()
+    return render(request, "share_data.html", {"data": data, "submission_id": submission_id, "run_id": run_id, "shares_created": shares_created})
+
+@user_passes_test(lambda u: u.is_staff)
 def create_submission_share(request, pk):
     submission = Submission.objects.get(pk=pk)
-    if hasattr(submission, 'share'):
-        raise HttpResponseForbidden('This submission already has an associated share.')
-    share = SubmissionShare(submission=submission)
-    share.save()
+    submission.create_share()
     return redirect('submission', pk=pk)
