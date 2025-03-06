@@ -228,7 +228,7 @@ class RunLane(models.Model):
     run = models.ForeignKey(Run, models.DO_NOTHING, related_name='lanes')
     lane_number = models.CharField(max_length=2, blank=True, null=True)
     # db_group = models.ForeignKey(DbGroup, models.DO_NOTHING)
-    group = models.ForeignKey(Group, on_delete=models.RESTRICT)
+    group = models.ForeignKey(Group, null=True, on_delete=models.RESTRICT)
     organism = models.ForeignKey(Organism, models.DO_NOTHING, blank=True, null=True)
     concentration = models.FloatField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
@@ -252,6 +252,14 @@ class RunLane(models.Model):
     @staticmethod
     def get_user_lanes(user):
         return RunLane.objects.filter(group__in=user.groups.all())
+    @property
+    def pi_name(self):
+        if self.submission:
+            return self.submission.pi_name
+        elif self.group:
+            return str(self.group)
+        return None
+        
     # def create_data_dirs(self):
     #     self.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
     #     directories = self.generate_data_dirs()

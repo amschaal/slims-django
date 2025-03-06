@@ -57,7 +57,7 @@
 <form method="POST" action=".">
     {% csrf_token %}
     {{ run_form|crispy }}
-    <h2 class="title">Lanes</h2>
+    <h2 class="title">Containers / Pools</h2>
     <div id="lanes-container">
         {{ lane_formset | crispy }}
     </div>

@@ -48,7 +48,7 @@ class RunLaneForm(forms.ModelForm):
             'lane_number': 'Lane'
         }
         model = RunLane
-        fields = ["lane_number", "group", "submission", "project_id", "lane_dir", "description"]
+        fields = ["lane_number", "submission", "project_id", "lane_dir", "description"]#, "group"
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 

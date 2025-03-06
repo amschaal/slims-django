@@ -1,53 +1,68 @@
 {% extends "base.html" %}
 {% block 'content' %}
-<h1 class="title">
-    View Run
-    {% if user.is_staff and run.can_modify %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
-</h1>
-{% if message %}
-<h2>{{message}}</h2>
+<div class="card mt-2">
+    <div class="card-body">
+        <h3 class="card-title">
+            View Run
+            {% if user.is_staff and run.can_modify %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
+        </h3>
+        {% if message %}
+        <h2>{{message}}</h2>
+        {% endif %}
+        <h2>General Data</h2>
+        <table class="table">
+            {% if run.run_type %}
+            <tr><th>Run Type</th><td>{{run.run_type}}</td></tr>
+            {% endif %}
+            <tr><th>Machine</th><td>{{run.machine}}</td></tr>
+            <tr><th># Cycles</th><td>{{run.num_cycles}}</td></tr>
+            <tr><th>Run Directory</th><td>{{run.run_dir}}</td></tr>
+            <tr><th>Run Date</th><td>{{run.run_date}}</td></tr>
+            <tr><th>Submitted</th><td>{{run.submitted}}</td></tr>
+            <tr><th>Description</th><td>{{run.description}}</td></tr>
+            {% if user.is_staff %}<tr><th>Notes</th><td>{{run.notes}}</td></tr>{% endif %}
+        </table>
+    </div>
+</div>
+<div class="card mt-2">
+    <div class="card-body">
+        <h3 class="card-title">Pools/Containers</h3>
+        <a class="btn btn-primary" href="{% url 'share_run_data' run_id=run.pk %}">Share Data</a>
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Container</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Description</th>{% if user.is_staff%}<th>Data Directories</th>{% endif %}<th>Controls</th></tr>
+            </thead>
+            <tbody>
+                {% for l in lanes %}
+                    <tr>
+                        <td>{{l.lane_number}}</td>
+                        <td>{{l.pi_name}}</td>
+                        {% if user.is_staff %}
+                        <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
+                        {% endif %}
+                        <td>{{l.project_id}}</td>
+                        <td>{{l.lane_dir}}</td>
+                        <!-- <td>{{l.organism.name}}</td>
+                        <td>{{l.concentration}}</td> -->
+                        <td>{{l.description}}</td>
+                        {% if user.is_staff%}
+                            <td>
+                                {% for directory in l.directories.all%}
+                                    <div>{{directory.repository_subpath}} -> {{directory.data_path}}, <b>Status:</b> <span class="status-{{directory.status}}">{{directory.status}}</span> <i>{{directory.message}}</i></div>
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                        <td>{% if l.data_url %}<a href="{{l.data_url}}" class="btn btn-primary">Data</a>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% if user.is_staff and 0%}
+{% include 'vue/lanes.html' %}
 {% endif %}
-<h2>General Data</h2>
-<table class="table">
-    {% if run.run_type %}
-    <tr><th>Run Type</th><td>{{run.run_type}}</td></tr>
-    {% endif %}
-    <tr><th>Machine</th><td>{{run.machine}}</td></tr>
-    <tr><th># Cycles</th><td>{{run.num_cycles}}</td></tr>
-    <tr><th>Run Directory</th><td>{{run.run_dir}}</td></tr>
-    <tr><th>Run Date</th><td>{{run.run_date}}</td></tr>
-    <tr><th>Submitted</th><td>{{run.submitted}}</td></tr>
-    <tr><th>Description</th><td>{{run.description}}</td></tr>
-    {% if user.is_staff %}<tr><th>Notes</th><td>{{run.notes}}</td></tr>{% endif %}
-</table>
-<h2>Pools/Containers</h2>
-<table class="table table-striped">
-    <thead>
-        <tr><th>Container</th><th>Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Organism</th><th>Concentration</th><th>Description</th>{% if user.is_staff%}<th>Data Directories</th>{% endif %}<th>Controls</th></tr>
-    </thead>
-    <tbody>
-        {% for l in lanes %}
-            <tr>
-                <td>{{l.lane_number}}</td>
-                <td>{{l.group}}</td>
-                {% if user.is_staff %}
-                <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
-                {% endif %}
-                <td>{{l.project_id}}</td>
-                <td>{{l.lane_dir}}</td>
-                <td>{{l.organism.name}}</td>
-                <td>{{l.concentration}}</td>
-                <td>{{l.description}}</td>
-                {% if user.is_staff%}
-                    <td>{{l.generate_data_dirs}} - {{l.directories.all}}</td>
-                {% endif %}
-                <td><a href="{{l.data_url}}" class="btn btn-primary">Data</a></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-
-</table>
-
 <script>
     let delete_url = "{% url 'delete_run' pk=run.pk %}";
     function delete_run() {
