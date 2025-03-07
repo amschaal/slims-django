@@ -6,17 +6,17 @@ from crispy_forms.layout import Layout, Field, Row, Div
 class RunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        required_fields = ["machine"]
-        for field in required_fields:
-            self.fields[field].required = True
+        # required_fields = ["machine"]
+        # for field in required_fields:
+        #     self.fields[field].required = True
     class Meta:
         model = Run
-        fields = ["run_type", "run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["run_type", "run_date", "machine_name", "run_dir", "description", "notes"]
 
 class PacbioRunForm(RunForm):
     class Meta:
         model = Run
-        fields = ["description", "machine", "notes"]
+        fields = ["description", "machine_name", "notes"]
 
 # Following helper is not working for some reason.
 class RunLaneHelper(FormHelper):

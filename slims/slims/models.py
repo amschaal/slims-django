@@ -170,6 +170,21 @@ class RolePermission(models.Model):
         db_table = 'role_permission'
         unique_together = (('role', 'permission'),)
 
+class RunType(models.Model):
+    id = models.SlugField(max_length=20, blank=False, primary_key=True)
+    name = models.CharField(max_length=50, db_index=True)
+
+class Machine(models.Model):
+    id = models.SlugField(max_length=20, blank=False, primary_key=True)
+    name = models.CharField(max_length=50, db_index=True)
+    base_directory = models.CharField(max_length=75, null=True, blank=True)
+    run_types = models.ManyToManyField(RunType, symmetrical=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.__unicode__()
 
 class Run(models.Model):
     run_id = models.AutoField(primary_key=True)
@@ -177,7 +192,7 @@ class Run(models.Model):
     submitted = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     num_cycles = models.IntegerField(blank=True, null=True)
     run_date = models.DateField(blank=True, null=True)
-    machine = models.CharField(max_length=100, blank=True, null=True)
+    machine_name = models.CharField(max_length=100, blank=True, null=True)
     run_dir = models.CharField(max_length=100, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     pipeline = models.IntegerField(blank=True, null=True)

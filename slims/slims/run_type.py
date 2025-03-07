@@ -1,16 +1,17 @@
 from collections import OrderedDict
-from .models import LaneData
+from .models import LaneData, RunType
 from .forms import RunForm, PacbioRunForm, LaneFormSet
 
 
-class  RunType(object):
+class  RunTypeBase(object):
     id = 'Run'
     name = 'General Run'
     _run_template = 'run.html'
     _run_form_template = 'run_forms/edit_run.html'
     _run_form = RunForm
     _lane_formset = LaneFormSet
-    _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
+    # _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
+    _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{lane.lane_dir}'}]
     def __init__(self, run=None):
         self.run = run
     @property
@@ -47,11 +48,11 @@ class  RunType(object):
         # return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
 
 
-class IlluminaRun(RunType):
+class IlluminaRun(RunTypeBase):
     id = 'Illumina'
     name = 'Illumina Run'
 
-class PacbioRun(RunType):
+class PacbioRun(RunTypeBase):
     id = 'Pacbio'
     name = 'Pacbio Run'
     # _run_form_template = 'run_forms/pacbio.html'
@@ -62,10 +63,12 @@ class RunTypeRegistry:
     @classmethod
     def register(cls, klass):
         if klass.id not in cls.klasses:
+            print('klass.id', klass.id)
+            RunType.objects.get_or_create(id=klass.id, name=klass.name)
             cls.klasses[klass.id] = klass
     @classmethod
     def get(cls, id):
-        return cls.klasses.get(id, RunType)
+        return cls.klasses.get(id, RunTypeBase)
     @classmethod
     def choices(cls):
         return [(klass.id, klass.name) for id, klass in cls.klasses.items()]
@@ -80,6 +83,6 @@ class RunTypeRegistry:
     #         self.classes[klass.id]
 
 # registry = RunTypeRegistry()
-run_types = [RunType, IlluminaRun, PacbioRun]
+run_types = [RunTypeBase, IlluminaRun, PacbioRun]
 for r in run_types:
     RunTypeRegistry.register(r)
