@@ -173,6 +173,8 @@ class RolePermission(models.Model):
 class RunType(models.Model):
     id = models.SlugField(max_length=20, blank=False, primary_key=True)
     name = models.CharField(max_length=50, db_index=True)
+    def __str__(self):
+        return self.name
 
 class Machine(models.Model):
     id = models.SlugField(max_length=20, blank=False, primary_key=True)
@@ -187,11 +189,13 @@ class Machine(models.Model):
         return self.__unicode__()
 
 class Run(models.Model):
+    type = models.ForeignKey(RunType, null=True, on_delete=models.RESTRICT)
     run_id = models.AutoField(primary_key=True)
     description = models.TextField(blank=True, null=True)
     submitted = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     num_cycles = models.IntegerField(blank=True, null=True)
     run_date = models.DateField(blank=True, null=True)
+    machine = models.ForeignKey(Machine, null=True, on_delete=models.RESTRICT)
     machine_name = models.CharField(max_length=100, blank=True, null=True)
     run_dir = models.CharField(max_length=100, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
@@ -216,7 +220,8 @@ class Run(models.Model):
     @cached_property
     def run_class(self):
         from .run_type import RunType, RunTypeRegistry
-        return RunTypeRegistry.get(self.run_type)(self)
+        return RunTypeRegistry.get(self.type_id)(self)
+        # return RunTypeRegistry.get(self.run_type)(self)
     def __str__(self):
         return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.machine or ''))
     class Meta:

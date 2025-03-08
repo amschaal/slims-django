@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from .models import LaneData, RunType
-from .forms import RunForm, PacbioRunForm, LaneFormSet
-
+from .models import LaneData, RunType, Run, RunLane
+from .forms import RunForm, PacbioRunForm, LaneFormSet, RunLaneForm, SLIMSRunForm, SLIMSLaneForm
+from django import forms
 
 class  RunTypeBase(object):
     id = 'Run'
@@ -9,7 +9,8 @@ class  RunTypeBase(object):
     _run_template = 'run.html'
     _run_form_template = 'run_forms/edit_run.html'
     _run_form = RunForm
-    _lane_formset = LaneFormSet
+    _lane_form = RunLaneForm
+    _lane_formset = None#LaneFormSet
     # _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
     _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{lane.lane_dir}'}]
     def __init__(self, run=None):
@@ -29,7 +30,10 @@ class  RunTypeBase(object):
     def lane_formset(self):
         # from .forms import LaneFormSet
         # return LaneFormSet
-        return self._lane_formset
+        if self._lane_formset:
+            return self._lane_formset
+        return forms.inlineformset_factory(Run, RunLane, form=self._lane_form, extra=1)
+        
     def generate_lane_directories(self, lane):
         directories = []
         for t in self._data_directory_templates:
@@ -47,6 +51,14 @@ class  RunTypeBase(object):
         return LaneData.objects.bulk_create(instances)
         # return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
 
+class SLIMSRun(RunTypeBase):
+    id = 'SLIMSRun'
+    name = 'SLIMS Classic'
+    _run_template = 'run.html'
+    _run_form_template = 'run_forms/edit_run.html'
+    _run_form = SLIMSRunForm
+    _lane_form = SLIMSLaneForm
+    _data_directory_templates = []
 
 class IlluminaRun(RunTypeBase):
     id = 'Illumina'
@@ -83,6 +95,6 @@ class RunTypeRegistry:
     #         self.classes[klass.id]
 
 # registry = RunTypeRegistry()
-run_types = [RunTypeBase, IlluminaRun, PacbioRun]
+run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun]
 for r in run_types:
     RunTypeRegistry.register(r)

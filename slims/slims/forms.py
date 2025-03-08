@@ -3,7 +3,7 @@ from slims.models import Run, RunLane
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
 
-class RunForm(forms.ModelForm):
+class SLIMSRunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # required_fields = ["machine"]
@@ -11,7 +11,17 @@ class RunForm(forms.ModelForm):
         #     self.fields[field].required = True
     class Meta:
         model = Run
-        fields = ["run_type", "run_date", "machine_name", "run_dir", "description", "notes"]
+        fields = ["run_date", "machine_name", "run_dir", "description", "notes"]
+
+class RunForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        required_fields = ["machine"]
+        for field in required_fields:
+            self.fields[field].required = True
+    class Meta:
+        model = Run
+        fields = ["type", "run_date", "machine", "run_dir", "description", "notes"]
 
 class PacbioRunForm(RunForm):
     class Meta:
@@ -35,10 +45,22 @@ class RunLaneForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows']=2
         self.fields['lane_number'].required = True
-        # if self.instance:
-        #     self.fields['lane_number'].disabled = True
-        # self.fields['lane_number'].la = 'foo'
-        # self.fields['submission'].queryset = Submission.objects.f
+    class Meta:
+        widgets = {
+            'lane_number': forms.NumberInput({'class': 'lane-input'})
+            # 'group': forms.Select(attrs={'class': 'select2'})
+        }
+        labels = {
+            'lane_number': 'Lane'
+        }
+        model = RunLane
+        fields = ["lane_number", "submission", "project_id", "lane_dir", "description"]#, "group"
+
+class SLIMSLaneForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs['rows']=2
+        self.fields['lane_number'].required = True
     class Meta:
         widgets = {
             'lane_number': forms.NumberInput({'class': 'lane-input'}),
@@ -48,7 +70,7 @@ class RunLaneForm(forms.ModelForm):
             'lane_number': 'Lane'
         }
         model = RunLane
-        fields = ["lane_number", "submission", "project_id", "lane_dir", "description"]#, "group"
+        fields = ["lane_number", "group", "project_id", "lane_dir", "description"]#, "group"
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 
