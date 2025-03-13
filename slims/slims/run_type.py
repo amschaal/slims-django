@@ -2,7 +2,7 @@ from collections import OrderedDict
 from .models import LaneData, RunType, Run, RunLane
 from .forms import RunForm, PacbioRunForm, LaneFormSet, RunLaneForm, SLIMSRunForm, SLIMSLaneForm
 from django import forms
-
+from django.conf import settings
 class  RunTypeBase(object):
     id = 'Run'
     name = 'General Run'
@@ -12,9 +12,12 @@ class  RunTypeBase(object):
     _lane_form = RunLaneForm
     _lane_formset = None#LaneFormSet
     # _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
-    _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{lane.lane_dir}'}]
+    _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     def __init__(self, run=None):
         self.run = run
+    @property
+    def settings(self):
+        return settings.RUN_TYPE_OPTIONS.get(self.id, {})
     @property
     def run_template(self):
         return self._run_template
@@ -36,7 +39,7 @@ class  RunTypeBase(object):
         
     def generate_lane_directories(self, lane):
         directories = []
-        for t in self._data_directory_templates:
+        for t in self.settings.get('data_directory_templates', self._data_directory_templates):
             data_path = t['data_path'].format(run=self.run, lane=lane)
             if 'repository_subpath' in t:
                 repository_subpath = t['repository_subpath'].format(run=self.run, lane=lane)

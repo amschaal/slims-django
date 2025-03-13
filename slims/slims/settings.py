@@ -153,4 +153,6 @@ AUTHENTICATION_BACKENDS = [
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/profile/'
 
+RUN_TYPE_OPTIONS = {}
+
 from .config import *

@@ -322,9 +322,9 @@ class LaneData(models.Model):
                     self.status = LaneData.STATUS_ERROR
                     if 'errors' in data:
                         self.message = str(data['errors'])
-            except:
+            except Exception as e:
                 self.status = LaneData.STATUS_ERROR
-                self.message = 'There was an error linking'
+                self.message = 'There was an error linking: {}'.format(e)
             self.save()
             return True
         return False

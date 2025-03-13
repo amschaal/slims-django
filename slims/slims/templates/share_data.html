@@ -5,7 +5,7 @@
         <h3 class="card-title">Sharing data from {% if submission_id %}submission{% else %}run{% endif %}</h3>
         <table class="table table-striped">
             <thead>
-                <tr><th>Submission</th><th>Run</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th></tr>
+                <tr><th>Submission</th><th>Run</th><th>Lane</th><th>Project ID</th><th>Lane Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th></tr>
             </thead>
             <tbody>
                 {% for d in data %}
@@ -19,6 +19,7 @@
                         <td>{{d.repository_subpath}}</td>
                         <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
                         <td><span class="status-{{d.status}}">{{d.status}}</span></td>
+                        <td>{{d.message}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
