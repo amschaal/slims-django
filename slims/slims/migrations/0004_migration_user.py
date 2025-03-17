@@ -8,7 +8,7 @@ def import_users(apps, schema_editor):
     users = []
     used_logins = set()
     for u in SlimsUser.objects.all():
-        username = u.login.lower()
+        username = u.login.lower().strip()
         if username in used_logins:
             duplicate_users.append(username)
             continue

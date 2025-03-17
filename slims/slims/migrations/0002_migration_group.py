@@ -13,7 +13,7 @@ def import_groups(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('slims', '0001_initial')
+        ('slims', '0001_charset')
     ]
 
     operations = [

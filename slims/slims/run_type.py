@@ -76,10 +76,10 @@ class PacbioRun(RunTypeBase):
 class RunTypeRegistry:
     klasses = OrderedDict()
     @classmethod
-    def register(cls, klass):
+    def register(cls, klass,):
         if klass.id not in cls.klasses:
-            print('klass.id', klass.id)
-            RunType.objects.get_or_create(id=klass.id, name=klass.name)
+            # print('klass.id', klass.id)
+            # RunType.objects.get_or_create(id=klass.id, name=klass.name)
             cls.klasses[klass.id] = klass
     @classmethod
     def get(cls, id):
@@ -87,6 +87,10 @@ class RunTypeRegistry:
     @classmethod
     def choices(cls):
         return [(klass.id, klass.name) for id, klass in cls.klasses.items()]
+    @classmethod
+    def sync_db(cls):
+        for id, klass in cls.klasses.items():
+            RunType.objects.get_or_create(id=klass.id, name=klass.name)
     # def __new__(cls):
     #     if not hasattr(cls, 'instance'):
     #         cls.instance = super(RunTypeRegistry, cls).__new__(cls)

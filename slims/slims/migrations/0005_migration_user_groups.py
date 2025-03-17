@@ -10,14 +10,14 @@ def import_user_groups(apps, schema_editor):
     # Some users exist multiple times in SLIMS, but weren't imported.  Look up by login.
     user_id_lookup = {}
     for u in User.objects.all():
-        user_id_lookup[u.username.lower()] = u.id
+        user_id_lookup[u.username.lower().strip()] = u.id
 
     user_groups = set()
     for ugp in UserGroupPermission.objects.all().select_related('user'):
-        user_id = user_id_lookup[ugp.user.login.lower()]
+        user_id = user_id_lookup[ugp.user.login.lower().strip()]
         user_groups.add((user_id, ugp.group_id))
     for ugr in UserGroupRole.objects.all().select_related('user'):
-        user_id = user_id_lookup[ugr.user.login.lower()]
+        user_id = user_id_lookup[ugr.user.login.lower().strip()]
         user_groups.add((user_id, ugr.group_id))
     UserGroupThrough = User.groups.through
     user_group_relations = [

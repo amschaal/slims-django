@@ -87,9 +87,9 @@ DATABASES = {
         "PASSWORD": os.environ.get("SQL_PASSWORD"),
         "HOST": os.environ.get("SQL_HOST", "db"),
         "PORT": os.environ.get("SQL_PORT", "3306"),
-        "OPTIONS": {
-            "charset": 'latin1'
-        }
+        # "OPTIONS": {
+        #     "charset": 'latin1'
+        # }
     }
 }
 # Password validation
