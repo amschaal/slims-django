@@ -1,7 +1,7 @@
 import re
 import urllib.request, json
 from django.conf import settings
-from .config import CREATE_URL, GET_URL, AUTH_TOKEN, SYMLINK_URL
+from .settings import CREATE_URL, GET_URL, AUTH_TOKEN, SYMLINK_URL
 
 def bioshare_request(url, token=AUTH_TOKEN, data=None):
     print('bioshare url', url, 'token', token)

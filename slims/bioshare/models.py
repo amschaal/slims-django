@@ -1,5 +1,5 @@
 from django.db import models
-from .config import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP
+from .settings import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP
 from coreomics.models import Submission
 from .requests import bioshare_post, bioshare_get, create_share, link_data
 from django.utils import timezone
