@@ -2,6 +2,7 @@ import re
 import urllib.request, json
 from django.conf import settings
 from .config import CREATE_URL, GET_URL, AUTH_TOKEN, SYMLINK_URL
+
 def bioshare_request(url, token=AUTH_TOKEN, data=None):
     print('bioshare url', url, 'token', token)
     params = json.dumps(data).encode('utf8')
@@ -49,4 +50,7 @@ def create_share(name, description=None, filesystem=None):
 def link_data(share_id, target, share_path):
         url = SYMLINK_URL.format(id=share_id)
         params = {"name":share_path,"target":target}
+        # try:
         return bioshare_post(url, params)
+        # except Exception as e:
+        #      print(e)
