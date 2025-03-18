@@ -11,8 +11,9 @@ class  RunTypeBase(object):
     _run_form = RunForm
     _lane_form = RunLaneForm
     _lane_formset = None#LaneFormSet
+    _data_directory_templates = [{'data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     # _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
-    _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+    # _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     def __init__(self, run=None):
         self.run = run
     @property
@@ -67,6 +68,11 @@ class IlluminaRun(RunTypeBase):
     id = 'Illumina'
     name = 'Illumina Run'
 
+class AvitiRun(RunTypeBase):
+    id = 'Aviti'
+    name = 'Aviti Run'
+    _data_directory_templates = [{'data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+
 class PacbioRun(RunTypeBase):
     id = 'Pacbio'
     name = 'Pacbio Run'
@@ -90,7 +96,7 @@ class RunTypeRegistry:
     @classmethod
     def sync_db(cls):
         for id, klass in cls.klasses.items():
-            RunType.objects.get_or_create(id=klass.id, name=klass.name)
+            print(RunType.objects.get_or_create(id=klass.id, name=klass.name))
     # def __new__(cls):
     #     if not hasattr(cls, 'instance'):
     #         cls.instance = super(RunTypeRegistry, cls).__new__(cls)
@@ -102,6 +108,6 @@ class RunTypeRegistry:
     #         self.classes[klass.id]
 
 # registry = RunTypeRegistry()
-run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun]
+run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun, AvitiRun]
 for r in run_types:
     RunTypeRegistry.register(r)
