@@ -5,7 +5,8 @@ from datetime import date, timedelta
 
 def import_submissions(days=30):
     last_updated = date.today() - timedelta(days=days)
-    url = '{base_url}/server/api/submissions/?page=1&page_size=100&lab=dnatech&updated__date__gte={last_updated}'.format(base_url=settings.COREOMICS_BASE_URL, last_updated=str(last_updated))
+    # TODO: change this to filtering by updated, not submitted date in order to catch updates in submission.  Need to make this filter (updated__date__gte) available in Coreomics first....
+    url = '{base_url}/server/api/submissions/?page=1&page_size=100&lab=dnatech&submitted__date__gte={last_updated}'.format(base_url=settings.COREOMICS_BASE_URL, last_updated=str(last_updated)) #updated__date__gte={last_updated}
     imported = []
     while url:
         print(url)
