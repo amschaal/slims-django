@@ -19,6 +19,7 @@
         <tr>
             <th>Submitted</th>
             <th>Run date</th>
+            <th>Type</th>
             <th>Machine</th>
             <th>Run Directory</th>
             <th># Cycles</th>
@@ -42,6 +43,7 @@
                     }
                 },
                 { data: "run_date", render: DataTable.render.date()},
+                { data: "type" },
                 { data: "machine" },
                 { data: "run_dir", sortable: false },
                 { data: "num_cycles" },
