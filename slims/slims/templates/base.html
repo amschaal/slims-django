@@ -56,13 +56,18 @@
           <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Logged in as {{user}} </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                  <li>
+                    <form action="{% url 'logout' %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item btn btn-text">Logout</button>
+                    </form>
+                  </li>
               </ul>
           </li>
       </ul>
       {% else %}
       <li class="nav-item">
-        <a class="nav-link" href="#">Log in</a>
+        <a class="nav-link" href="{% url 'login' %}">Log in</a>
       </li>
       {% endif %}
       </ul>

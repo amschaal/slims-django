@@ -23,6 +23,7 @@ from slims.api.views import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", views.index, name="index"),
     path("runs/", views.runs, name="runs"),
     path("runs/create/<slug:run_type>/", views.edit_run, name="create_run"),
     path("runs/<int:pk>/", views.run, name="run"),

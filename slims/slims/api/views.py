@@ -38,9 +38,9 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Run.objects.all().annotate(num_lanes=Count('lanes'))
     serializer_class = RunSerializer
-    ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'num_cycles', 'run_dir']
+    ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'type', 'num_cycles', 'run_dir']
     ordering = ['run_date']
-    search_fields = ['run_date', 'machine', 'submitted', 'run_type', 'run_dir', 'description']
+    search_fields = ['run_date', 'machine__name', 'machine__id', 'submitted', 'run_type', 'type__name', 'type__id', 'run_dir', 'description']
 
 class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]

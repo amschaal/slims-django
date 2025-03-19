@@ -9,6 +9,14 @@ from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
+def index(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    elif request.user.is_staff:
+        return redirect('runs')
+    else:
+        return redirect('profile')
+
 @user_passes_test(lambda u: u.is_staff)
 def runs(request):
     return render(request, "runs.html", { 'run_types': RunTypeRegistry.choices() })
