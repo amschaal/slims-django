@@ -68,6 +68,11 @@ class IlluminaRun(RunTypeBase):
     id = 'Illumina'
     name = 'Illumina Run'
 
+class MiSeqRun(RunTypeBase):
+    id = 'MiSeq'
+    name = 'MiSeq Run'
+    _data_directory_templates = [{'data_path': '/share/illumina/miseq/{run.run_dir}', 'repository_subpath': '{run.run_dir}'}]
+
 class AvitiRun(RunTypeBase):
     id = 'Aviti'
     name = 'Aviti Run'
