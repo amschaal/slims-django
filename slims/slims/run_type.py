@@ -73,6 +73,12 @@ class MiSeqRun(RunTypeBase):
     name = 'MiSeq Run'
     _data_directory_templates = [{'data_path': '/share/illumina/miseq/{run.run_dir}', 'repository_subpath': '{run.run_dir}'}]
 
+# /share/illumina/nextseq/{run.rundir}/Unaligned2/Project_{lane.lane_dir}/
+class NextSeqRun(RunTypeBase):
+    id = 'NextSeq'
+    name = 'NextSeq Run'
+    _data_directory_templates = [{'data_path': '/share/illumina/nextseq/{run.rundir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
+
 class AvitiRun(RunTypeBase):
     id = 'Aviti'
     name = 'Aviti Run'
@@ -113,6 +119,6 @@ class RunTypeRegistry:
     #         self.classes[klass.id]
 
 # registry = RunTypeRegistry()
-run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun, AvitiRun]
+run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun, AvitiRun, NextSeqRun, MiSeqRun]
 for r in run_types:
     RunTypeRegistry.register(r)
