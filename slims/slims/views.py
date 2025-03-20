@@ -7,7 +7,7 @@ from coreomics.models import Submission
 from bioshare.models import SubmissionShare
 from coreomics.utils import import_submissions
 from .run_type import RunTypeRegistry
-from .models import LaneData, Run, RunLane
+from .models import LaneData, Run, RunLane, RunType
 from .forms import RunForm, LaneFormSet, RunLaneHelper
 
 def index(request):
@@ -42,7 +42,8 @@ def delete_run(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def edit_run(request, pk=None, run_type=None):
     helper = RunLaneHelper()
-    run = Run(run_type=run_type)
+    run_type = RunType.objects.filter(id=run_type).first()
+    run = Run(type=run_type)
     if pk:
         run = Run.objects.get(pk=pk)
         if not run.can_modify:

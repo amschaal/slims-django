@@ -24,9 +24,10 @@ class RunForm(forms.ModelForm):
         fields = ["type", "run_date", "machine", "run_dir", "description", "notes"]
 
 class PacbioRunForm(RunForm):
-    class Meta:
-        model = Run
-        fields = ["description", "machine_name", "notes"]
+    pass
+    # class Meta:
+    #     model = Run
+        # fields = ["description", "machine"machine_name", "notes"]
 
 # Following helper is not working for some reason.
 class RunLaneHelper(FormHelper):
