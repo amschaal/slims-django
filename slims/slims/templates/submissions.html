@@ -3,6 +3,11 @@
 <h1 class="title">
     Submissions
 </h1>
+<form action="." method="POST">
+    <input type="hidden" name="update" value="1">
+    <button class="btn btn-primary" type="submit">Import Recent</button>
+    {% csrf_token %}
+</form>
 <table id="submissions" class="table table-striped" style="width:100%">
     <thead>
         <tr>

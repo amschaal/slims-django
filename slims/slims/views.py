@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
+from coreomics.utils import import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane
 from .forms import RunForm, LaneFormSet, RunLaneHelper
@@ -87,6 +88,8 @@ def group(request, pk):
 
 @user_passes_test(lambda u: u.is_staff)
 def submissions(request):
+    if request.method == 'POST' and 'update' in request.POST:
+        import_submissions(days=7)
     return render(request, "submissions.html")
 
 @user_passes_test(lambda u: u.is_staff)
