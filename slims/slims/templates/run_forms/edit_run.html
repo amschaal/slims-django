@@ -73,9 +73,7 @@
     </div>
 </div>
 <script>
-let currentIndex = {% if run.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
-function create_group_select(elements) {
-    elements.select2({
+let group = {
             placeholder: "Select group...",
             minimumInputLength: 2,
             ajax: {
@@ -102,7 +100,45 @@ function create_group_select(elements) {
                 },
                 cache: true
             }
-        });
+        };
+let submission = {
+            placeholder: "Select submission...",
+            minimumInputLength: 2,
+            ajax: {
+                url: '/api/submissions',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        offset: (params.page || 0) * 10,  // Use pagination with limit/offset
+                        limit: 10
+                    }
+                    return query;
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    let results = data.results.map(function (s) { return { id: s.id, text: s.internal_id || s.id } })
+                    return {
+                        results: results,  // Your paginated results here
+                        pagination: {
+                            more: data.next != null  // Check if more data is available
+                        }
+                    };
+                },
+                cache: true
+            }
+        };
+let configs = { submission, group };
+let currentIndex = {% if run.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
+function create_group_select(elements) {
+    elements.each(function(index, element) {
+        let config = $(this).attr('config');
+        if (config && configs[config]) {
+            $(this).select2(configs[config]);
+        }
+    })
+    // elements.select2(group);
 }
 $(document).ready(function() {
         let formIndex = $('#lanes-container .multiField').length - 1; // Get the number of current forms

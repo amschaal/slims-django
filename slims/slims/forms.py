@@ -1,4 +1,5 @@
 from django import forms
+from coreomics.models import Submission
 from slims.models import Run, RunLane
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
@@ -21,7 +22,7 @@ class RunForm(forms.ModelForm):
             self.fields[field].required = True
     class Meta:
         model = Run
-        fields = ["type", "run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["run_date", "machine", "run_dir", "description", "notes"]
 
 class PacbioRunForm(RunForm):
     pass
@@ -42,14 +43,27 @@ class RunLaneHelper(FormHelper):
         )
 
 class RunLaneForm(forms.ModelForm):
+    # submission = forms.ModelChoiceField(
+    #     queryset=Submission.objects.all(),  # This is not used to pre-populate the select.
+    #     required=True,  # The field is required
+    #     widget=forms.Select(attrs={'class': 'select2', 'config': 'submission'})
+    # )
+        # choices=[('', 'Choose submission...')],  # Empty placeholder option
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows']=2
         self.fields['lane_number'].required = True
+    # def clean_submission(self):
+    #     submission_id = self.cleaned_data['submission']
+    #     submission = Submission.objects.filter(id=submission_id).first()
+    #     if not submission:
+    #         raise forms.ValidationError('Please choose a submission.')
+    #     return submission
     class Meta:
         widgets = {
-            'lane_number': forms.NumberInput({'class': 'lane-input'})
-            # 'group': forms.Select(attrs={'class': 'select2'})
+            'lane_number': forms.NumberInput({'class': 'lane-input'}),
+            'submission': forms.Select(attrs={'class': 'select2', 'config': 'submission'})
         }
         labels = {
             'lane_number': 'Lane'
@@ -65,7 +79,7 @@ class SLIMSLaneForm(forms.ModelForm):
     class Meta:
         widgets = {
             'lane_number': forms.NumberInput({'class': 'lane-input'}),
-            'group': forms.Select(attrs={'class': 'select2'})
+            'group': forms.Select(attrs={'class': 'select2', 'config': 'group'})
         }
         labels = {
             'lane_number': 'Lane'
