@@ -67,7 +67,11 @@
     <a class="btn btn-success" id="add-lane">Add Lane</a>
     <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
-
+<div id="empty-form" style="display:none;">
+    <div class="multiField">
+    {{ lane_formset.empty_form | crispy }}
+    </div>
+</div>
 <script>
 let currentIndex = {% if run.pk %}{{ run_form.instance.ordered_lanes.count }}{% else %}0{% endif%};
 function create_group_select(elements) {
@@ -106,34 +110,34 @@ $(document).ready(function() {
         $('#add-lane').on('click', function() {
             var newIndex = currentIndex + 1;
             // Clone the last form in the formset
-            let newForm = $('#lanes-container .multiField').last().clone();
+            let newForm = $('#empty-form .multiField').clone();// '#lanes-container .multiField'
             // Reset input values
-            newForm.find('input, textarea, select').val('');
+            // newForm.find('input, textarea, select').val('');
             // Update the form's IDs, names, and management form fields
             newForm.find('input, textarea, select').each(function() {
                 let name = $(this).attr('name');
-                name = name.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                name = name.replace('__prefix__', newIndex);
                 $(this).attr('name', name);
             });
             newForm.find('[id]').each(function() {
                 let id = $(this).attr('id');
-                id = id.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                id = id.replace('__prefix__', newIndex);
                 $(this).attr('id', id);
             });
             newForm.find('[for]').each(function() {
                 let val = $(this).attr('for');
-                val = val.replace('-' + currentIndex + '-', '-' + newIndex + '-');
+                val = val.replace('__prefix__', newIndex);
                 $(this).attr('for', val);
             });
             newForm.find('.lane_number').html(currentIndex);
             // Add the new form to the container
             $('#lanes-container').append(newForm);
-            // create_group_select(newForm.find('.select2'))
+            create_group_select(newForm.find('.select2'))
             // Update the management form's total form count
             currentIndex = newIndex;
             $('#id_lanes-TOTAL_FORMS').val(newIndex + 1);
         });
-        create_group_select($('.select2'))
+        create_group_select($('form .select2'));
     });
 </script>
 <style>
