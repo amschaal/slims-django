@@ -222,6 +222,8 @@ class Run(models.Model):
         from .run_type import RunType, RunTypeRegistry
         return RunTypeRegistry.get(self.type_id)(self)
         # return RunTypeRegistry.get(self.run_type)(self)
+    def get_machine(self):
+        return self.machine_name or self.machine
     def __str__(self):
         return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.machine or ''))
     class Meta:

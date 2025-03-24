@@ -118,7 +118,7 @@ let submission = {
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
-                    let results = data.results.map(function (s) { return { id: s.id, text: s.internal_id || s.id } })
+                    let results = data.results.map(function (s) { return { id: s.id, text: s.submitted.substr(0,10) + ': ' + (s.internal_id || s.id) } })
                     return {
                         results: results,  // Your paginated results here
                         pagination: {

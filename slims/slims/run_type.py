@@ -100,7 +100,7 @@ class RunTypeRegistry:
             cls.klasses[klass.id] = klass
     @classmethod
     def get(cls, id):
-        return cls.klasses.get(id, RunTypeBase)
+        return cls.klasses.get(id, SLIMSRun)
     @classmethod
     def choices(cls):
         return [(klass.id, klass.name) for id, klass in cls.klasses.items()]

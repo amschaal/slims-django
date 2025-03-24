@@ -7,15 +7,17 @@
             {% if user.is_staff and run.can_modify %}<a href="{% url 'edit_run' pk=run.pk %}" class="btn btn-primary">Edit</a> {% if run.can_delete %}<a onClick="delete_run()" class="btn btn-danger">Delete</a>{% endif %}{% endif%}
         </h3>
         {% if message %}
-        <h2>{{message}}</h2>
+        <h3>{{message}}</h3>
         {% endif %}
-        <h2>General Data</h2>
+        <h3>General Data</h3>
         <table class="table">
             {% if run.run_type %}
             <tr><th>Run Type</th><td>{{run.run_type}}</td></tr>
             {% endif %}
-            <tr><th>Machine</th><td>{{run.machine}}</td></tr>
-            <!-- <tr><th># Cycles</th><td>{{run.num_cycles}}</td></tr> -->
+            <tr><th>Machine</th><td>{{run.get_machine}}</td></tr>
+            {% if run.num_cycles %}
+            <tr><th># Cycles</th><td>{{run.num_cycles}}</td></tr>
+            {% endif %}
             <tr><th>Run Directory</th><td>{{run.run_dir}}</td></tr>
             <tr><th>Run Date</th><td>{{run.run_date}}</td></tr>
             <tr><th>Submitted</th><td>{{run.submitted}}</td></tr>
@@ -27,7 +29,9 @@
 <div class="card mt-2">
     <div class="card-body">
         <h3 class="card-title">Pools/Containers</h3>
+        {% if user.is_staff %}
         <a class="btn btn-primary" href="{% url 'share_run_data' run_id=run.pk %}">Share Data</a>
+        {% endif %}
         <table class="table table-striped">
             <thead>
                 <tr><th>Container</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Description</th>{% if user.is_staff%}<th>Data Directories</th>{% endif %}<th>Controls</th></tr>
