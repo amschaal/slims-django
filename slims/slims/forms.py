@@ -3,26 +3,37 @@ from coreomics.models import Submission
 from slims.models import Run, RunLane
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
+from .widgets import Select2Widget
 
 class SLIMSRunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs['rows']=2
+        self.fields['notes'].widget.attrs['rows']=2
         # required_fields = ["machine"]
         # for field in required_fields:
         #     self.fields[field].required = True
     class Meta:
         model = Run
         fields = ["run_date", "machine_name", "run_dir", "description", "notes"]
+        widgets = {
+            'run_date': forms.DateInput(attrs={'type': 'date'})
+        }
 
 class RunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         required_fields = ["machine"]
+        self.fields['description'].widget.attrs['rows']=2
+        self.fields['notes'].widget.attrs['rows']=2
         for field in required_fields:
             self.fields[field].required = True
     class Meta:
         model = Run
         fields = ["run_date", "machine", "run_dir", "description", "notes"]
+        widgets = {
+            'run_date': forms.DateInput(attrs={'type': 'date'})
+        }
 
 class PacbioRunForm(RunForm):
     pass
@@ -41,6 +52,7 @@ class RunLaneHelper(FormHelper):
             Div('project_id', css_class='column is-3'),
             Div('description', css_class='column is-5'),
         )
+
 
 class RunLaneForm(forms.ModelForm):
     # submission = forms.ModelChoiceField(
@@ -63,7 +75,7 @@ class RunLaneForm(forms.ModelForm):
     class Meta:
         widgets = {
             'lane_number': forms.NumberInput({'class': 'lane-input'}),
-            'submission': forms.Select(attrs={'class': 'select2', 'config': 'submission'})
+            'submission': Select2Widget(attrs={'class': 'select2', 'config': 'submission'})
         }
         labels = {
             'lane_number': 'Lane'
@@ -79,7 +91,7 @@ class SLIMSLaneForm(forms.ModelForm):
     class Meta:
         widgets = {
             'lane_number': forms.NumberInput({'class': 'lane-input'}),
-            'group': forms.Select(attrs={'class': 'select2', 'config': 'group'})
+            'group': Select2Widget(attrs={'class': 'select2', 'config': 'group'})
         }
         labels = {
             'lane_number': 'Lane'
