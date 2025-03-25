@@ -20,3 +20,17 @@ def import_submissions(days=30):
             imported.append(instance)
         url = data['next']
     print('{} submissions imported or updated'.format(len(imported)))
+
+def link_share(submission, share):
+    url = '{base_url}/server/api/plugins/bioshare/submissions/{submission_id}/submission_shares/import_share/'.format(base_url=settings.COREOMICS_BASE_URL,submission_id=submission.id)
+    data = { "url": share.url }
+    params = json.dumps(data).encode('utf8')
+    req = urllib.request.Request(url, data=params)
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Authorization', 'Token {token}'.format(token=settings.COREOMICS_TOKEN))
+    try:
+        response = urllib.request.urlopen(req)
+    except urllib.request.HTTPError as e:
+        error_message = e.read()
+        raise Exception(error_message)
+    return response
