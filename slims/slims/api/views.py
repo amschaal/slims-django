@@ -85,6 +85,11 @@ class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ['submitted', 'internal_id', 'submitter_name', 'submitter_email', 'pi_name', 'pi_email', 'submission_type']
     ordering = ['-submitted']
     search_fields = ['internal_id', 'id', 'submitter_name', 'pi_name', 'submitter_email', 'pi_email', 'submission_type']
+    @action(detail=True, methods=['post'])
+    def link_share(self, request, pk=None):
+        submission = self.get_object()
+        submission.link_share()
+        return Response(SubmissionSerializer(submission).data)
 
 class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SubmissionShare.objects.all()
@@ -93,8 +98,8 @@ class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     def share_with_clients(self, request, pk=None):
         share = self.get_object()
         share.share()
+        share.submission.link_share()
         return Response(BioshareSerializer(share).data)
-
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()

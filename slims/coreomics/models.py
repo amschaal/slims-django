@@ -19,7 +19,12 @@ class Submission(models.Model):
         return str(self.submitted)[:10] + ': ' + (self.internal_id or self.id)
     def update(self, data=None, commit=True):
         if data:
+            # print(data['updated'], self.data)
+            # if self.data and self.data['updated'] and (self.data['updated'] >= data['updated']):
+            #     print('###No need to update {}###'.format(self.id))
+            #     return
             self.data = data
+        # print('***Updating {} ***'.format(self.id))
         self.internal_id = self.data['internal_id']
         self.submission_type = self.data['type']['name']
         self.submitter_name = self.data['last_name'] + ', ' + self.data['first_name']
@@ -44,3 +49,8 @@ class Submission(models.Model):
         # share.update_permissions()
         share.share_with_group_and_participants()
         return share
+    def link_share(self):
+        from .utils import link_share
+        if hasattr(self, 'share'):
+            link_share(self, self.share)
+        

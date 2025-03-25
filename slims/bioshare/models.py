@@ -56,7 +56,9 @@ class SubmissionShare(models.Model):
             perms = {"groups": {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}, "email":email}
             return self.set_permissions(perms)
     def share_with_group_and_participants(self, email=False):
-        perms = {"groups": {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}, "users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.submission.data['participants']]), "email":email}
+        perms = {"users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.submission.data['participants']]), "email":email}
+        if DEFAULT_GROUP:
+            perms["groups"] = {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}
         return self.set_permissions(perms)
     def share(self, contacts=True, email=False):
         emails = [self.submission.submitter_email, self.submission.pi_email]
