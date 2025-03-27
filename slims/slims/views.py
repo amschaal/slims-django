@@ -101,18 +101,23 @@ def submission(request, pk):
     return render(request, "submission.html", {"submission": submission})
 
 @user_passes_test(lambda u: u.is_staff)
-def share_data(request, submission_id=None, run_id=None):
-    if submission_id:
-        data = LaneData.objects.filter(lane__submission_id=submission_id)
-    elif run_id:
-        data = LaneData.objects.filter(lane__run_id=run_id)
+def share_data(request, run_id):
+    run = Run.objects.get(pk=run_id)
+    data_ids = request.POST.getlist('data')
+    data = LaneData.objects.filter(lane__run_id=run_id, id__in=data_ids)
     shares_created = []
     for d in data:
         d.status_before = d.status
         if not hasattr(d.lane.submission, 'share'):
             shares_created.append(d.lane.submission.create_share())
         d.share()
-    return render(request, "share_data.html", {"data": data, "submission_id": submission_id, "run_id": run_id, "shares_created": shares_created})
+    return render(request, "share_data.html", {"data": data, "run_id": run_id, "shares_created": shares_created})
+
+@user_passes_test(lambda u: u.is_staff)
+def run_data(request, pk):
+    run = Run.objects.get(pk=pk)
+    data = LaneData.objects.filter(lane__run_id=pk)
+    return render(request, "run_data.html", {"data": data, "run": run})
 
 @user_passes_test(lambda u: u.is_staff)
 def create_submission_share(request, pk):

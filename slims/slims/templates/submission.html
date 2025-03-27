@@ -17,7 +17,6 @@
 <div class="card mt-2">
     <div class="card-body">
         <h3 class="card-title">Pools / Containers</h3>
-        <a class="btn btn-primary" href="{% url 'share_submission_data' submission_id=submission.id %}">Share Data</a>
         <table class="table table-striped">
             <thead>
                 <tr><th>Run</th><th>Lane</th><th>PI/Group</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
@@ -34,7 +33,7 @@
                         <td>{{l.description}}</td>
                         <td>
                             {% for directory in l.directories.all%}
-                            <div>{{directory.repository_subpath}} -> {{directory.data_path}}, <b>Status:</b> <span class="status-{{directory.status}}">{{directory.status}}</span> <i>{{directory.message}}</i></div>
+                            <div><span title="{{directory.data_path}}">{{directory.repository_subpath}}</span> <b>Status:</b> <span class="status-{{directory.status}}" title="{{directory.message}}">{{directory.status}}</span></div>
                             {% endfor %}
                         </td>
                     </tr>
