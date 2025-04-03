@@ -3,7 +3,7 @@
 <div class="card mt-2">
     <div class="card-body">
         <h3 class="card-title"><a href="{% url 'runs' %}">Runs</a> / <a href="{% url 'run' pk=run.pk %}">{{run}}</a> / Data</h3>
-        <form action="{% url 'share_run_data' run_id=run.pk %}" method="POST">
+        <form action="." method="POST" id="data_form">
             <table class="table table-striped">
                 <thead>
                     <tr><th></th><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th></tr>
@@ -11,7 +11,7 @@
                 <tbody>
                     {% for d in data %}
                         <tr>
-                            <td>{% if d.status != 'COMPLETES' %}<input type="checkbox" name="data" value="{{d.pk}}"/>{% endif%}</td>
+                            <td>{% if d.can_modify %}<input type="checkbox" name="data" value="{{d.pk}}"/>{% endif%}</td>
                             <td><a href="{% url 'submission' pk=d.lane.submission.pk %}">{{d.lane.submission}}</a></td>
                             <td>{{d.lane.lane_number}}</td>
                             <td>{{d.lane.project_id}}</td>
@@ -26,7 +26,8 @@
                 </tbody>
             </table>
             {% csrf_token %}
-            <button type="submit">Share</button>
+            <input type="hidden" name="action"/>
+            <a class="btn btn-primary" onclick="submit('share')">Share</a> <a class="btn btn-primary" onclick="submit('delete')">Delete</a>
         </form>
     </div>
 </div>
@@ -36,4 +37,12 @@
         <a href="{{s.url}}" target="_blank">{{s}}</a> 
     {% endfor %}
 {% endif %}
+<script>
+    function submit(action){
+        alert($('input[name=action]'))
+        $('input[name=action]').val(action);
+        $('#data_form').submit();
+        // return false;
+    }
+</script>
 {% endblock %}

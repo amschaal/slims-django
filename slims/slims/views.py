@@ -104,6 +104,7 @@ def submission(request, pk):
 def share_data(request, run_id):
     run = Run.objects.get(pk=run_id)
     data_ids = request.POST.getlist('data')
+    # raise Exception('data', data_ids, request.POST['action'])
     data = LaneData.objects.filter(lane__run_id=run_id, id__in=data_ids)
     shares_created = []
     for d in data:
@@ -116,8 +117,20 @@ def share_data(request, run_id):
 @user_passes_test(lambda u: u.is_staff)
 def run_data(request, pk):
     run = Run.objects.get(pk=pk)
-    data = LaneData.objects.filter(lane__run_id=pk)
-    return render(request, "run_data.html", {"data": data, "run": run})
+    action = request.POST.get('action')
+    data_ids = [int(id) for id in request.POST.getlist('data')]
+    filtered_data = LaneData.objects.filter(lane__run=run, id__in=data_ids)
+    context = {"run": run, "action": action, "shares_created": []}
+    if action:
+        if action == 'delete':
+            context['deleted'] = filtered_data.exclude(status=LaneData.STATUS_COMPLETE).delete()
+        elif action == 'share':
+            for d in filtered_data:
+                if not hasattr(d.lane.submission, 'share'):
+                    context["shares_created"].append(d.lane.submission.create_share())
+                d.share()
+    context['data'] = LaneData.objects.filter(lane__run=run)
+    return render(request, "run_data.html", context)
 
 @user_passes_test(lambda u: u.is_staff)
 def create_submission_share(request, pk):
