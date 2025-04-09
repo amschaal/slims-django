@@ -29,6 +29,7 @@ urlpatterns = [
     path("runs/<int:pk>/", views.run, name="run"),
     path("runs/<int:pk>/delete/", views.delete_run, name="delete_run"),
     path("runs/<int:pk>/edit/", views.edit_run, name="edit_run"),
+    path("data/<int:pk>/edit/", views.create_edit_lanedata, name="edit_lane_data"),
     path("runs/<int:pk>/data/", views.run_data, name="run_data"),
     path("runs/<int:run_id>/share_data/", views.share_data, name="share_run_data"),
     path("users/", views.users, name="users"),

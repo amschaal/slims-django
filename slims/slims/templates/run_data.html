@@ -6,7 +6,7 @@
         <form action="." method="POST" id="data_form">
             <table class="table table-striped">
                 <thead>
-                    <tr><th></th><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th></tr>
+                    <tr><th></th><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th><th></th></th></tr>
                 </thead>
                 <tbody>
                     {% for d in data %}
@@ -21,13 +21,14 @@
                             <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
                             <td><span class="status-{{d.status}}">{{d.status}}</span></td>
                             <td>{{d.message}}</td>
+                            <td>{% if d.can_modify %}<a class="btn btn-primary" href="{% url 'edit_lane_data' pk=d.pk %}">Modify</a>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% csrf_token %}
             <input type="hidden" name="action"/>
-            <a class="btn btn-primary" onclick="submit('share')">Share</a> <a class="btn btn-primary" onclick="submit('delete')">Delete</a>
+            <a class="btn btn-primary" onclick="submit('share')">Share</a> <a class="btn btn-danger" onclick="submit('delete')">Delete</a>
         </form>
     </div>
 </div>
@@ -39,7 +40,7 @@
 {% endif %}
 <script>
     function submit(action){
-        alert($('input[name=action]'))
+        // alert($('input[name=action]'))
         $('input[name=action]').val(action);
         $('#data_form').submit();
         // return false;

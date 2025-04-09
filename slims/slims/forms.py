@@ -1,6 +1,6 @@
 from django import forms
 from coreomics.models import Submission
-from slims.models import Run, RunLane
+from slims.models import Run, RunLane, LaneData
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
 from .widgets import Select2Widget
@@ -124,3 +124,12 @@ class RunWithLanesForm(forms.Form):
                     lane.save()
 
         return run
+
+class LaneDataForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.run = kwargs.pop('run')
+        super().__init__(*args, **kwargs)
+        self.fields['lane'].queryset = RunLane.objects.filter(run=self.run)
+    class Meta:
+        model = LaneData
+        fields = ["lane", "data_path", "repository_subpath"]

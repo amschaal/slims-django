@@ -8,7 +8,7 @@ from bioshare.models import SubmissionShare
 from coreomics.utils import import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane, RunType
-from .forms import RunForm, LaneFormSet, RunLaneHelper
+from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
 
 def index(request):
     if not request.user.is_authenticated:
@@ -137,3 +137,14 @@ def create_submission_share(request, pk):
     submission = Submission.objects.get(pk=pk)
     submission.create_share()
     return redirect('submission', pk=pk)
+
+@user_passes_test(lambda u: u.is_staff)
+def create_edit_lanedata(request, pk=None, run_id=None):
+    instance = LaneData.objects.get(pk=pk) if pk else None
+    run = instance.lane.run if instance else Run.objects.get(pk=run_id)
+    form = LaneDataForm(request.POST or None,run=run, instance=instance)
+    if request.method == 'POST':
+        if form.is_valid():
+            lane_data = form.save()
+            return redirect('run_data', pk=run.pk)
+    return render(request, 'run_forms/run_data_form.html', { "form": form, "run": run})
