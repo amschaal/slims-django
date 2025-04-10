@@ -133,3 +133,5 @@ class LaneDataForm(forms.ModelForm):
     class Meta:
         model = LaneData
         fields = ["lane", "data_path", "repository_subpath"]
+
+LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)

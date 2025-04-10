@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block 'content' %}
+<h1 class="title">
+    Edit Run Data
+</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {% for lane, formset in formsets %}
+        <fieldset style="margin-bottom: 2em; padding: 1em; border: 1px solid #ccc;">
+            <legend><strong>{{ lane }}</strong></legend>
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div style="margin-bottom: 0.5em;">
+                    {{ form.title.label_tag }} {{ form.title }}
+                    {{ form | crispy }}
+                </div>
+            {% endfor %}
+        </fieldset>
+    {% endfor %}
+    <button type="submit">Save All Changes</button>
+</form>
+{% endblock %}

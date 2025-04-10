@@ -8,7 +8,7 @@ from bioshare.models import SubmissionShare
 from coreomics.utils import import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane, RunType
-from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
+from .forms import LaneDataFormSet, RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
 
 def index(request):
     if not request.user.is_authenticated:
@@ -148,3 +148,47 @@ def create_edit_lanedata(request, pk=None, run_id=None):
             lane_data = form.save()
             return redirect('run_data', pk=run.pk)
     return render(request, 'run_forms/run_data_form.html', { "form": form, "run": run})
+
+@user_passes_test(lambda u: u.is_staff)
+def edit_run_data(request, pk):
+    lanes = RunLane.objects.filter(run_id=pk)
+    formsets = []
+
+    if request.method == 'POST':
+        is_valid = True
+        formsets = []
+
+        for lane in lanes:
+            formset = LaneDataFormSet(
+                request.POST,
+                queryset=LaneData.objects.filter(lane=lane),
+                prefix=f'lane_{lane.pk}'
+            )
+
+            if not formset.is_valid():
+                is_valid = False
+
+            formsets.append((lane, formset))
+
+        if is_valid:
+            for lane, formset in formsets:
+                instances = formset.save(commit=False)
+                for instance in instances:
+                    instance.lane = lane
+                    instance.save()
+                for obj in formset.deleted_objects:
+                    obj.delete()
+
+            return redirect('run_data', pk=pk)
+
+    else:
+        for lane in lanes:
+            formset = LaneDataFormSet(
+                queryset=LaneData.objects.filter(lane=lane),
+                prefix=f'lane_{lane.pk}'
+            )
+            formsets.append((lane, formset))
+
+    return render(request, 'run_forms/run_data_formset.html', {
+        'formsets': formsets
+    })
