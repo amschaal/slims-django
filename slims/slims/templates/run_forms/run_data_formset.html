@@ -8,18 +8,46 @@
 
 <form method="post">
     {% csrf_token %}
-    {% for lane, formset in formsets %}
-        <fieldset style="margin-bottom: 2em; padding: 1em; border: 1px solid #ccc;">
-            <legend><strong>{{ lane }}</strong></legend>
-            {{ formset.management_form }}
-            {% for form in formset %}
-                <div style="margin-bottom: 0.5em;">
-                    {{ form.title.label_tag }} {{ form.title }}
-                    {{ form | crispy }}
-                </div>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th></tr>
+        </thead>
+        <tbody>
+            {% for lane, formset in formsets %}
+            <tr>
+                <td><a href="{% url 'submission' pk=lane.submission.pk %}">{{lane.submission}}</a></td>
+                <td>{{lane.lane_number}}</td>
+                <td>{{lane.project_id}}</td>
+                <td>{{lane.lane_dir}}</td>
+                <!-- <td>{% if d.can_modify %}<a class="btn btn-primary" href="{% url 'edit_lane_data' pk=d.pk %}">Modify</a>{% endif %}</td> -->
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <table style="width: 100%">
+                        <!-- <tr><th>Data Path</th><th>Repository Subpath</th></tr> -->
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                        <tr>
+                            {% for field in form.visible_fields %}
+                            <td>
+                                {% if forloop.first %}
+                                    {% for hidden in form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                {% endif %}
+                                <!-- {{ field.errors.as_ul }} -->
+                                {{ field|as_crispy_field }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
             {% endfor %}
-        </fieldset>
-    {% endfor %}
+        </tbody>
+    </table>
+    
     <button type="submit">Save All Changes</button>
 </form>
 {% endblock %}
