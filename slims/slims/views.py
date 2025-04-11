@@ -161,7 +161,7 @@ def edit_run_data(request, pk):
         for lane in lanes:
             formset = LaneDataFormSet(
                 request.POST,
-                queryset=LaneData.objects.filter(lane=lane),
+                queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
                 prefix=f'lane_{lane.pk}'
             )
 
@@ -184,7 +184,7 @@ def edit_run_data(request, pk):
     else:
         for lane in lanes:
             formset = LaneDataFormSet(
-                queryset=LaneData.objects.filter(lane=lane),
+                queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
                 prefix=f'lane_{lane.pk}'
             )
             formsets.append((lane, formset))
