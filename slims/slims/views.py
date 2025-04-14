@@ -130,6 +130,7 @@ def run_data(request, pk):
                     context["shares_created"].append(d.lane.submission.create_share())
                 d.share()
     context['data'] = LaneData.objects.filter(lane__run=run)
+    context['lanes'] =  RunLane.objects.filter(run=run)
     return render(request, "run_data.html", context)
 
 @user_passes_test(lambda u: u.is_staff)
@@ -139,15 +140,15 @@ def create_submission_share(request, pk):
     return redirect('submission', pk=pk)
 
 @user_passes_test(lambda u: u.is_staff)
-def create_edit_lanedata(request, pk=None, run_id=None):
+def create_edit_lanedata(request, lane_id=None, pk=None):
     instance = LaneData.objects.get(pk=pk) if pk else None
-    run = instance.lane.run if instance else Run.objects.get(pk=run_id)
-    form = LaneDataForm(request.POST or None,run=run, instance=instance)
+    lane = instance.lane if instance else RunLane.objects.get(pk=lane_id)
+    form = LaneDataForm(request.POST or None,lane=lane, instance=instance)
     if request.method == 'POST':
         if form.is_valid():
             lane_data = form.save()
-            return redirect('run_data', pk=run.pk)
-    return render(request, 'run_forms/run_data_form.html', { "form": form, "run": run})
+            return redirect('run_data', pk=lane.run.pk)
+    return render(request, 'run_forms/run_data_form.html', { "form": form, "lane": lane})
 
 @user_passes_test(lambda u: u.is_staff)
 def edit_run_data(request, pk):

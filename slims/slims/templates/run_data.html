@@ -6,22 +6,31 @@
         <form action="." method="POST" id="data_form">
             <table class="table table-striped">
                 <thead>
-                    <tr><th></th><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th><th></th></th></tr>
+                    <tr><th>Select</th><th>Submission</th><th>Unit</th><th>Project ID</th><th>Pool Dir</th><th>Data Path</th><th>Share Path</th><th>Old Status</th><th>Status</th><th>Message</th><th></th></th></tr>
                 </thead>
                 <tbody>
-                    {% for d in data %}
+                    {% for l in lanes %}
                         <tr>
-                            <td>{% if d.can_modify %}<input type="checkbox" name="data" value="{{d.pk}}"/>{% endif%}</td>
-                            <td><a href="{% url 'submission' pk=d.lane.submission.pk %}">{{d.lane.submission}}</a></td>
-                            <td>{{d.lane.lane_number}}</td>
-                            <td>{{d.lane.project_id}}</td>
-                            <td>{{d.lane.lane_dir}}</td>
-                            <td class="text-break">{{d.data_path}}</td>
-                            <td class="text-break">{{d.repository_subpath}}</td>
-                            <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
-                            <td><span class="status-{{d.status}}">{{d.status}}</span></td>
-                            <td>{{d.message}}</td>
-                            <td>{% if d.can_modify %}<a class="btn btn-primary" href="{% url 'edit_lane_data' pk=d.pk %}">Modify</a>{% endif %}</td>
+                            <td></td>
+                            <td><a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a></td>
+                            <td>{{l.lane_number}}</td>
+                            <td>{{l.project_id}}</td>
+                            <td>{{l.lane_dir}}</td>
+                            <td colspan="6"></td>
+                            <td><a class="btn btn-success" href="{% url 'create_lane_data' lane_id=l.pk %}">New</a></td>
+                        </tr>
+                            {% for d in l.directories.all %}
+                            <tr>
+                                <td>{% if d.can_modify %}<input type="checkbox" name="data" value="{{d.pk}}" class="form-check-input"/>{% endif%}</td>
+                                <td colspan="5"></td>
+                                <td class="text-break">{{d.data_path}}</td>
+                                <td class="text-break">{{d.repository_subpath}}</td>
+                                <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
+                                <td><span class="status-{{d.status}}">{{d.status}}</span></td>
+                                <td>{{d.message}}</td>
+                                <td>{% if d.can_modify %}<a class="btn btn-primary" href="{% url 'edit_lane_data' pk=d.pk %}">Modify</a>{% endif %}</td>
+                            </tr>
+                            {% endfor %}
                         </tr>
                     {% endfor %}
                 </tbody>
