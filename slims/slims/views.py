@@ -151,6 +151,13 @@ def create_edit_lanedata(request, lane_id=None, pk=None):
     return render(request, 'run_forms/run_data_form.html', { "form": form, "lane": lane})
 
 @user_passes_test(lambda u: u.is_staff)
+def delete_lanedata(request, pk=None):
+    instance = LaneData.objects.get(pk=pk)
+    if instance.can_delete:
+        instance.delete()
+    return redirect('run_data', pk=instance.lane.run.pk)
+
+@user_passes_test(lambda u: u.is_staff)
 def edit_run_data(request, pk):
     lanes = RunLane.objects.filter(run_id=pk)
     formsets = []
