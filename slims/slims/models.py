@@ -265,6 +265,8 @@ class RunLane(models.Model):
     submission = models.ForeignKey(Submission, models.RESTRICT, null=True, related_name='lanes') # fix character sets or do: alter table coreomics_submission convert to character set latin1;
     def generate_data_dirs(self):
         return self.run.run_class.generate_lane_directories(self)
+    def __str__(self):
+        return '{}'.format(self.lane_number)
     @property
     def data_url(self):
         if self.submission and self.submission.share:
@@ -281,7 +283,13 @@ class RunLane(models.Model):
         elif self.group:
             return str(self.group)
         return None
-        
+    def grouped_directories(self):
+        statuses = {}
+        for d in self.directories.all():
+            if d.status not in statuses:
+                statuses[d.status] = []
+            statuses[d.status].append(d)
+        return statuses
     # def create_data_dirs(self):
     #     self.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
     #     directories = self.generate_data_dirs()
@@ -332,6 +340,12 @@ class LaneData(models.Model):
         return False
     @property
     def can_share(self):
+        return self.status in [LaneData.STATUS_NEW, LaneData.STATUS_ERROR]
+    @property
+    def can_delete(self):
+        return self.status in [LaneData.STATUS_NEW, LaneData.STATUS_ERROR]
+    @property
+    def can_modify(self):
         return self.status in [LaneData.STATUS_NEW, LaneData.STATUS_ERROR]
     def __str__(self):
         return self.data_path

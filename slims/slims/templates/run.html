@@ -30,7 +30,7 @@
     <div class="card-body">
         <h3 class="card-title">Pools/Containers</h3>
         {% if user.is_staff %}
-        <a class="btn btn-primary" href="{% url 'share_run_data' run_id=run.pk %}">Share Data</a>
+        <a class="btn btn-primary" href="{% url 'run_data' pk=run.pk %}">Manage Data</a>
         {% endif %}
         <table class="table table-striped">
             <thead>
@@ -51,8 +51,8 @@
                         <td>{{l.description}}</td>
                         {% if user.is_staff%}
                             <td>
-                                {% for directory in l.directories.all%}
-                                    <div><span title="{{directory.data_path}}">{{directory.repository_subpath}}</span> <b>Status:</b> <span class="status-{{directory.status}}" title="{{directory.message}}">{{directory.status}}</span></div>
+                                {% for status, directories in l.grouped_directories.items %}
+                                    <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
                                 {% endfor %}
                             </td>
                         {% endif %}

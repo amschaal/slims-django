@@ -127,11 +127,18 @@ class RunWithLanesForm(forms.Form):
 
 class LaneDataForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        self.run = kwargs.pop('run')
+        self.lane = kwargs.pop('lane')
         super().__init__(*args, **kwargs)
-        self.fields['lane'].queryset = RunLane.objects.filter(run=self.run)
+        # self.fields['lane'].queryset = RunLane.objects.filter(run=self.run)
+    def save(self, commit = ...):
+        instance = super().save(commit=False)
+        if not getattr(instance, 'lane', None):
+            instance.lane = self.lane
+        if commit:
+            instance.save()
+        return instance
     class Meta:
         model = LaneData
-        fields = ["lane", "data_path", "repository_subpath"]
+        fields = ["data_path", "repository_subpath"]
 
-LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)
+# LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)
