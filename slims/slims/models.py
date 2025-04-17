@@ -263,6 +263,7 @@ class RunLane(models.Model):
     job_id = models.CharField(max_length=50, blank=True, null=True)
     project_id = models.CharField(max_length=50, blank=True, null=True)
     submission = models.ForeignKey(Submission, models.RESTRICT, null=True, related_name='lanes') # fix character sets or do: alter table coreomics_submission convert to character set latin1;
+    data = models.JSONField(default=dict)
     def generate_data_dirs(self):
         return self.run.run_class.generate_lane_directories(self)
     def __str__(self):
@@ -314,7 +315,7 @@ class LaneData(models.Model):
     STATUS_COMPLETE = 'COMPLETE'
     STATUSES = ((STATUS_NEW, 'New'), (STATUS_IN_PROGRESS, 'Transfer In Progress'), (STATUS_ERROR, 'Error'), (STATUS_COMPLETE, 'Complete'))
     lane = models.ForeignKey(RunLane, related_name='directories', on_delete=models.CASCADE)
-    data_path = models.CharField(max_length=100)
+    data_path = models.CharField(max_length=200)
     repository_subpath = models.CharField(max_length=100)
     transfer_type = models.CharField(max_length=10, choices=TRANSFER_CHOICES, default=TRANSFER_LINK)
     status = models.CharField(max_length=15, choices=STATUSES, default=STATUS_NEW)
