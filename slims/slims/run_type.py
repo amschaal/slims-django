@@ -11,7 +11,7 @@ class  RunTypeBase(object):
     _run_form = RunForm
     _lane_form = RunLaneForm
     _lane_formset = None#LaneFormSet
-    _data_directory_templates = [{'data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+    _data_directory_templates = [{'data_id': 'LANE_DIR', 'data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     # _data_directory_templates = [{'data_path': '/share/example/run/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': 'subfolder/{lane.lane_dir}'}]
     # _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     def __init__(self, run=None):
@@ -47,12 +47,12 @@ class  RunTypeBase(object):
                 repository_subpath = t['repository_subpath'].format(run=self.run, lane=lane)
             else:
                 repository_subpath = data_path.split('/')[-1]
-            directories.append(LaneData(lane=lane, data_path=data_path, repository_subpath=repository_subpath))
+            directories.append(LaneData(data_id=t.get('data_id', None),lane=lane, data_path=data_path, repository_subpath=repository_subpath))
         # instances = [LaneData(lane=lane, data_path=d['data_path'], repository_subpath=d.get('repository_subpath', d['data_path'].split('/')[-1])) for d in directories]
         return directories
     def create_lane_directories(self, lane):
         instances = self.generate_lane_directories(lane)
-        lane.directories.exclude(status=LaneData.STATUS_COMPLETE).delete()
+        lane.directories.filter(data_id__isnull=False).exclude(status=LaneData.STATUS_COMPLETE).delete()
         return LaneData.objects.bulk_create(instances)
         # return [t.format(run=self.run, lane=lane) for t in self._data_directory_templates]
 
@@ -72,26 +72,26 @@ class IlluminaRun(RunTypeBase):
 class MiSeqRun(RunTypeBase):
     id = 'MiSeq'
     name = 'MiSeq Run'
-    _data_directory_templates = [{'data_path': '/share/illumina/miseq/{run.run_dir}', 'repository_subpath': '{run.run_dir}'}]
+    _data_directory_templates = [{'data_id': 'LANE_DIR', 'data_path': '/share/illumina/miseq/{run.run_dir}', 'repository_subpath': '{run.run_dir}'}]
 
 # /share/illumina/nextseq/{run.rundir}/Unaligned2/Project_{lane.lane_dir}/
 class NextSeqRun(RunTypeBase):
     id = 'NextSeq'
     name = 'NextSeq Run'
-    _data_directory_templates = [{'data_path': '/share/illumina/nextseq/{run.run_dir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
+    _data_directory_templates = [{'data_id': 'LANE_DIR','data_path': '/share/illumina/nextseq/{run.run_dir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
 
 class NovaSeqRun(RunTypeBase):
     id = 'NovaSeq'
     name = 'NovaSeq Run'
     _lane_form = NovaSeqLaneForm
-    _data_directory_templates = [{'data_path': '/share/illumina/hiseq/{run.run_dir}/{unaligned}/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+    _data_directory_templates = [{'data_id': 'LANE_DIR','data_path': '/share/illumina/hiseq/{run.run_dir}/{unaligned}/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     def get_format_arguments(self, run, lane):
-        return {'run':run, 'lane':lane, 'unaligned': lane.data['unaligned'] if lane.data and 'unaligned' in lane.data else 'Unaligned'}
+        return {'run':run, 'lane':lane, 'unaligned': lane.data['unaligned'] if lane.data and lane.data.get('unaligned') else 'Unaligned'}
 
 class AvitiRun(RunTypeBase):
     id = 'Aviti'
     name = 'Aviti Run'
-    _data_directory_templates = [{'data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+    _data_directory_templates = [{'data_id': 'LANE_DIR','data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
 
 class PacbioRun(RunTypeBase):
     id = 'Pacbio'
