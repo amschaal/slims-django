@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from .models import LaneData, RunType, Run, RunLane
-from .forms import RunForm, PacbioRunForm, LaneFormSet, RunLaneForm, SLIMSRunForm, SLIMSLaneForm
+from .forms import RunForm, PacbioRunForm, LaneFormSet, RunLaneForm, SLIMSRunForm, SLIMSLaneForm, NovaSeqLaneForm
 from django import forms
 from django.conf import settings
 class  RunTypeBase(object):
@@ -37,11 +37,12 @@ class  RunTypeBase(object):
         if self._lane_formset:
             return self._lane_formset
         return forms.inlineformset_factory(Run, RunLane, form=self._lane_form, extra=1)
-        
+    def get_format_arguments(self, run, lane):
+        return {'run':self.run, 'lane':lane}
     def generate_lane_directories(self, lane):
         directories = []
         for t in self.settings.get('data_directory_templates', self._data_directory_templates):
-            data_path = t['data_path'].format(run=self.run, lane=lane)
+            data_path = t['data_path'].format(**self.get_format_arguments(self.run, lane))
             if 'repository_subpath' in t:
                 repository_subpath = t['repository_subpath'].format(run=self.run, lane=lane)
             else:
@@ -77,7 +78,15 @@ class MiSeqRun(RunTypeBase):
 class NextSeqRun(RunTypeBase):
     id = 'NextSeq'
     name = 'NextSeq Run'
-    _data_directory_templates = [{'data_path': '/share/illumina/nextseq/{run.rundir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
+    _data_directory_templates = [{'data_path': '/share/illumina/nextseq/{run.run_dir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
+
+class NovaSeqRun(RunTypeBase):
+    id = 'NovaSeq'
+    name = 'NovaSeq Run'
+    _lane_form = NovaSeqLaneForm
+    _data_directory_templates = [{'data_path': '/share/illumina/hiseq/{run.run_dir}/{unaligned}/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
+    def get_format_arguments(self, run, lane):
+        return {'run':run, 'lane':lane, 'unaligned': lane.data['unaligned'] if lane.data and 'unaligned' in lane.data else 'Unaligned'}
 
 class AvitiRun(RunTypeBase):
     id = 'Aviti'
@@ -119,6 +128,6 @@ class RunTypeRegistry:
     #         self.classes[klass.id]
 
 # registry = RunTypeRegistry()
-run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun, AvitiRun, NextSeqRun, MiSeqRun]
+run_types = [RunTypeBase, IlluminaRun, PacbioRun, SLIMSRun, AvitiRun, NextSeqRun, MiSeqRun, NovaSeqRun]
 for r in run_types:
     RunTypeRegistry.register(r)

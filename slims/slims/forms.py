@@ -66,6 +66,36 @@ class RunLaneForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows']=2
         self.fields['lane_number'].required = True
+
+         # If it's an existing instance, populate metadata fields with values from the model
+        if self.instance and self.instance.data:
+            data = self.instance.data
+            for field_name in list(self.fields.keys()):
+                if field_name.startswith('metadata_'):
+                    # Extract the key part after 'metadata_'
+                    metadata_key = field_name[len('metadata_'):]
+
+                    # Set initial value from the model's meta_data field if the key exists
+                    if metadata_key in data:
+                        self.fields[field_name].initial = data[metadata_key]
+    def clean(self):
+        cleaned_data = super().clean()
+        data = {}
+
+        # Loop through the fields and collect any 'metadata_*' fields
+        for field_name, value in cleaned_data.items():
+            if field_name.startswith('metadata_'):
+                metadata_key = field_name[len('metadata_'):]  # Get the key part after 'metadata_'
+                data[metadata_key] = value
+
+        cleaned_data['data'] = data
+        return cleaned_data
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.data = self.cleaned_data.get('data', {})
+        if commit:
+            instance.save()
+        return instance
     # def clean_submission(self):
     #     submission_id = self.cleaned_data['submission']
     #     submission = Submission.objects.filter(id=submission_id).first()
@@ -99,6 +129,9 @@ class SLIMSLaneForm(forms.ModelForm):
         }
         model = RunLane
         fields = ["lane_number", "group", "project_id", "lane_dir", "description"]#, "group"
+
+class NovaSeqLaneForm(RunLaneForm):
+    metadata_unaligned = forms.CharField(label="Unaligned Directory", required=False)
 
 LaneFormSet = forms.inlineformset_factory(Run, RunLane, form=RunLaneForm, extra=1)
 
