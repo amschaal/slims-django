@@ -8,7 +8,7 @@ from bioshare.models import SubmissionShare
 from coreomics.utils import import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane, RunType
-from .forms import LaneDataFormSet, RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
+from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
 
 def index(request):
     if not request.user.is_authenticated:
@@ -121,14 +121,14 @@ def run_data(request, pk):
     data_ids = [int(id) for id in request.POST.getlist('data')]
     filtered_data = LaneData.objects.filter(lane__run=run, id__in=data_ids)
     context = {"run": run, "action": action, "shares_created": []}
-    if action:
-        if action == 'delete':
-            context['deleted'] = filtered_data.exclude(status=LaneData.STATUS_COMPLETE).delete()
-        elif action == 'share':
-            for d in filtered_data:
+    # raise Exception(filtered_data)
+    if action == 'share':
+        for d in filtered_data:
                 if not hasattr(d.lane.submission, 'share'):
                     context["shares_created"].append(d.lane.submission.create_share())
                 d.share()
+    # elif action == 'delete':
+    #     context['deleted'] = filtered_data.exclude(status=LaneData.STATUS_COMPLETE).delete()
     context['data'] = LaneData.objects.filter(lane__run=run)
     context['lanes'] =  RunLane.objects.filter(run=run)
     return render(request, "run_data.html", context)
@@ -143,6 +143,8 @@ def create_submission_share(request, pk):
 def create_edit_lanedata(request, lane_id=None, pk=None):
     instance = LaneData.objects.get(pk=pk) if pk else None
     lane = instance.lane if instance else RunLane.objects.get(pk=lane_id)
+    if 'regenerate' in request.GET:
+        instance.regenerate()
     form = LaneDataForm(request.POST or None,lane=lane, instance=instance)
     if request.method == 'POST':
         if form.is_valid():
@@ -157,46 +159,46 @@ def delete_lanedata(request, pk=None):
         instance.delete()
     return redirect('run_data', pk=instance.lane.run.pk)
 
-@user_passes_test(lambda u: u.is_staff)
-def edit_run_data(request, pk):
-    lanes = RunLane.objects.filter(run_id=pk)
-    formsets = []
+# @user_passes_test(lambda u: u.is_staff)
+# def edit_run_data(request, pk):
+#     lanes = RunLane.objects.filter(run_id=pk)
+#     formsets = []
 
-    if request.method == 'POST':
-        is_valid = True
-        formsets = []
+#     if request.method == 'POST':
+#         is_valid = True
+#         formsets = []
 
-        for lane in lanes:
-            formset = LaneDataFormSet(
-                request.POST,
-                queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
-                prefix=f'lane_{lane.pk}'
-            )
+#         for lane in lanes:
+#             formset = LaneDataFormSet(
+#                 request.POST,
+#                 queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
+#                 prefix=f'lane_{lane.pk}'
+#             )
 
-            if not formset.is_valid():
-                is_valid = False
+#             if not formset.is_valid():
+#                 is_valid = False
 
-            formsets.append((lane, formset))
+#             formsets.append((lane, formset))
 
-        if is_valid:
-            for lane, formset in formsets:
-                instances = formset.save(commit=False)
-                for instance in instances:
-                    instance.lane = lane
-                    instance.save()
-                for obj in formset.deleted_objects:
-                    obj.delete()
+#         if is_valid:
+#             for lane, formset in formsets:
+#                 instances = formset.save(commit=False)
+#                 for instance in instances:
+#                     instance.lane = lane
+#                     instance.save()
+#                 for obj in formset.deleted_objects:
+#                     obj.delete()
 
-            return redirect('run_data', pk=pk)
+#             return redirect('run_data', pk=pk)
 
-    else:
-        for lane in lanes:
-            formset = LaneDataFormSet(
-                queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
-                prefix=f'lane_{lane.pk}'
-            )
-            formsets.append((lane, formset))
+#     else:
+#         for lane in lanes:
+#             formset = LaneDataFormSet(
+#                 queryset=LaneData.objects.filter(lane=lane).exclude(status__in=[LaneData.STATUS_COMPLETE, LaneData.STATUS_IN_PROGRESS]),
+#                 prefix=f'lane_{lane.pk}'
+#             )
+#             formsets.append((lane, formset))
 
-    return render(request, 'run_forms/run_data_formset.html', {
-        'formsets': formsets
-    })
+#     return render(request, 'run_forms/run_data_formset.html', {
+#         'formsets': formsets
+#     })

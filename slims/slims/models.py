@@ -351,6 +351,15 @@ class LaneData(models.Model):
     @property
     def can_modify(self):
         return self.status in [LaneData.STATUS_NEW, LaneData.STATUS_ERROR]
+    @property
+    def run_class(self):
+        return self.lane.run.run_class
+    def regenerate(self):
+        template = self.run_class.template_dict.get(self.data_id)
+        if template:
+            lane_data = self.run_class.generate_lane_directory(self.lane, template)
+            self.data_path = lane_data.data_path
+            self.repository_subpath = lane_data.repository_subpath
     def __str__(self):
         return self.data_path
 

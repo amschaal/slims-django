@@ -16,6 +16,7 @@ class  RunTypeBase(object):
     # _data_directory_templates = [{'data_path': '/tmp/{run.run_dir}/{lane.lane_dir}', 'repository_subpath': '{run.run_dir}/{lane.lane_dir}'}]
     def __init__(self, run=None):
         self.run = run
+        self.template_dict = dict(((t['data_id'], t) for t in self._data_directory_templates))
     @property
     def settings(self):
         return settings.RUN_TYPE_OPTIONS.get(self.id, {})
@@ -39,15 +40,17 @@ class  RunTypeBase(object):
         return forms.inlineformset_factory(Run, RunLane, form=self._lane_form, extra=1)
     def get_format_arguments(self, run, lane):
         return {'run':self.run, 'lane':lane}
+    def generate_lane_directory(self, lane, template):
+        data_path = template['data_path'].format(**self.get_format_arguments(self.run, lane))
+        if 'repository_subpath' in template:
+            repository_subpath = template['repository_subpath'].format(run=self.run, lane=lane)
+        else:
+            repository_subpath = data_path.split('/')[-1]
+        return LaneData(data_id=template.get('data_id', None),lane=lane, data_path=data_path, repository_subpath=repository_subpath)
     def generate_lane_directories(self, lane):
         directories = []
-        for t in self.settings.get('data_directory_templates', self._data_directory_templates):
-            data_path = t['data_path'].format(**self.get_format_arguments(self.run, lane))
-            if 'repository_subpath' in t:
-                repository_subpath = t['repository_subpath'].format(run=self.run, lane=lane)
-            else:
-                repository_subpath = data_path.split('/')[-1]
-            directories.append(LaneData(data_id=t.get('data_id', None),lane=lane, data_path=data_path, repository_subpath=repository_subpath))
+        for template in self.settings.get('data_directory_templates', self._data_directory_templates):
+            directories.append(self.generate_lane_directory(lane, template))
         # instances = [LaneData(lane=lane, data_path=d['data_path'], repository_subpath=d.get('repository_subpath', d['data_path'].split('/')[-1])) for d in directories]
         return directories
     def create_lane_directories(self, lane):
