@@ -29,6 +29,7 @@
                         {% for form in formset %}
                         <tr>
                             {% for field in form.visible_fields %}
+                            {% if field.name != 'DELETE' or form.instance.can_delete %}
                             <td>
                                 {% if forloop.first %}
                                     {% for hidden in form.hidden_fields %}
@@ -38,6 +39,7 @@
                                 <!-- {{ field.errors.as_ul }} -->
                                 {{ field|as_crispy_field }}
                             </td>
+                            {% endif%}
                             {% endfor %}
                         </tr>
                         {% endfor %}

@@ -108,7 +108,7 @@ class RunLaneForm(forms.ModelForm):
             'submission': Select2Widget(attrs={'class': 'select2', 'config': 'submission'})
         }
         labels = {
-            'lane_number': 'Lane',
+            'lane_number': 'Unit',
             'lane_dir': 'Pool Directory'
         }
         model = RunLane

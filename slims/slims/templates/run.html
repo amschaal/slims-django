@@ -34,7 +34,7 @@
         {% endif %}
         <table class="table table-striped">
             <thead>
-                <tr><th>Container</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Lane Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
+                <tr><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
             </thead>
             <tbody>
                 {% for l in lanes %}

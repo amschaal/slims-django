@@ -57,14 +57,14 @@
 <form method="POST" action=".">
     {% csrf_token %}
     {{ run_form|crispy }}
-    <h2 class="title">Containers / Pools</h2>
+    <h2 class="title">Pools</h2>
     <div id="lanes-container">
         {{ lane_formset | crispy }}
     </div>
     {% if run.pk %}
         <a class="btn btn-danger" href="{% url 'run' pk=run.pk%}">Cancel</a>
     {% endif %}
-    <a class="btn btn-success" id="add-lane">Add Lane</a>
+    <a class="btn btn-success" id="add-lane">Add Pool</a>
     <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
 <div id="empty-form" style="display:none;">

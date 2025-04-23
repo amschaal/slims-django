@@ -27,7 +27,7 @@
                                 <td class="text-break">{{d.repository_subpath}}</td>
                                 <td><span class="status-{{d.status_before}}">{{d.status_before}}</span></td>
                                 <td><span class="status-{{d.status}}">{{d.status}}</span></td>
-                                <td>{{d.message}}</td>
+                                <td class="text-break">{{d.message}}</td>
                                 <td>
                                     {% if d.can_modify %}<a class="btn btn-primary" href="{% url 'edit_lane_data' pk=d.pk %}">Modify</a>{% endif %} {% if d.can_delete %}<a onclick="return confirm('Are you sure you want to delete this directory?')" href="{% url 'delete_lane_data' pk=d.pk %}" class="btn btn-danger">Delete</a>{% endif  %}</td>
                             </tr>

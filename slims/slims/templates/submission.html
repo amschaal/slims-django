@@ -16,10 +16,10 @@
 {% if submission.lanes.all.count %}
 <div class="card mt-2">
     <div class="card-body">
-        <h3 class="card-title">Pools / Containers</h3>
+        <h3 class="card-title">Pools</h3>
         <table class="table table-striped">
             <thead>
-                <tr><th>Run</th><th>Lane</th><th>PI/Group</th><th>Project ID</th><th>Lane Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
+                <tr><th>Run</th><th>Unit</th><th>PI/Group</th><th>Project ID</th><th>Pool Dir</th><th>Concentration</th><th>Description</th><th>Data Directories</th></tr>
             </thead>
             <tbody>
                 {% for l in submission.lanes.all %}
@@ -32,8 +32,8 @@
                         <td>{{l.concentration}}</td>
                         <td>{{l.description}}</td>
                         <td>
-                            {% for directory in l.directories.all%}
-                            <div><span title="{{directory.data_path}}">{{directory.repository_subpath}}</span> <b>Status:</b> <span class="status-{{directory.status}}" title="{{directory.message}}">{{directory.status}}</span></div>
+                            {% for status, directories in l.grouped_directories.items %}
+                                <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
                             {% endfor %}
                         </td>
                     </tr>

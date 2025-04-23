@@ -22,12 +22,12 @@
     {% if user.is_staff %}<tr><th>Notes</th><td>{{run.notes}}</td></tr>{% endif %}
 </table>
 {% endwith %}
-<h3>Lane</h3>
+<h3>Pool</h3>
 <table class="table">
     <tr><th>Submission</th><td><a href="{% url 'submission' pk=lane.submission.pk %}">{{lane.submission}}</a></td></tr>
-    <tr><th>Lane/Unit</th><td>{{lane.lane_number}}</td></tr>
+    <tr><th>Unit</th><td>{{lane.lane_number}}</td></tr>
     <tr><th>"Project ID"</th><td>{{lane.project_id}}</td></tr>
-    <tr><th>Lane Dir / Pool</th><td>{{lane.lane_dir}}</td></tr>
+    <tr><th>Pool Dir</th><td>{{lane.lane_dir}}</td></tr>
 </table>
 <form method="POST" action=".">
     {% csrf_token %}

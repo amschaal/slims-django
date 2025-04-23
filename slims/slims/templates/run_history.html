@@ -6,7 +6,7 @@
         <tr>
             <th>Run Date</th>
             <th>Machine</th>
-            <th>Lane</th>
+            <th>Unit</th>
             <th>Group</th>
             <th>Cycles</th>
             <th>Description</th>
@@ -17,7 +17,11 @@
 </table>
 <script>
     let isStaff = {% if request.user.is_staff %}true{% else %} false{% endif %};
+    {% if query %}
+    let query = "?{{query}}";
+    {% else %}
     let query = '{% if profile_user %}?user_id={{profile_user.pk}}{% elif group %}?group_id={{group.id}}{% endif %}';
+    {% endif %}
     $(document).ready(function () {
         $('#runs').DataTable({
             columns: [
