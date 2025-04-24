@@ -23,3 +23,6 @@ python manage.py migrate --fake-initial
 
 # Collect static files
 python manage.py collectstatic
+
+# Setup apache: copy and edit apache.example.conf to site-available, then symlink from sites-enabled
+c
