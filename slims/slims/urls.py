@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 from slims.api.views import router
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    
     path("", views.index, name="index"),
     path("runs/", views.runs, name="runs"),
     path("runs/create/<slug:run_type>/", views.edit_run, name="create_run"),
@@ -47,4 +47,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
