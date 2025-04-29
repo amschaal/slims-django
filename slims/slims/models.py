@@ -180,7 +180,7 @@ class Machine(models.Model):
     id = models.SlugField(max_length=20, blank=False, primary_key=True)
     name = models.CharField(max_length=50, db_index=True)
     base_directory = models.CharField(max_length=75, null=True, blank=True)
-    run_types = models.ManyToManyField(RunType, symmetrical=True)
+    run_types = models.ManyToManyField(RunType, symmetrical=True, related_name='machines')
 
     def __unicode__(self):
         return self.name

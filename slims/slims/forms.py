@@ -28,6 +28,9 @@ class RunForm(forms.ModelForm):
         self.fields['notes'].widget.attrs['rows']=2
         for field in required_fields:
             self.fields[field].required = True
+        if self.instance.type:
+            self.fields['machine'].queryset = self.instance.type.machines.distinct()
+
     class Meta:
         model = Run
         fields = ["run_date", "machine", "run_dir", "description", "notes"]
