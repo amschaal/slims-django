@@ -24,6 +24,7 @@ class RunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         required_fields = ["machine"]
+        self.fields['type'].disabled = True
         self.fields['description'].widget.attrs['rows']=2
         self.fields['notes'].widget.attrs['rows']=2
         for field in required_fields:
@@ -33,7 +34,7 @@ class RunForm(forms.ModelForm):
 
     class Meta:
         model = Run
-        fields = ["run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["type", "run_date", "machine", "run_dir", "description", "notes"]
         widgets = {
             'run_date': forms.DateInput(attrs={'type': 'date'})
         }

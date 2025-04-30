@@ -20,7 +20,7 @@ def index(request):
 
 @user_passes_test(lambda u: u.is_staff)
 def runs(request):
-    return render(request, "runs.html", { 'run_types': RunTypeRegistry.choices() })
+    return render(request, "runs.html", { 'run_types':  RunType.objects.filter(enabled=True)}) #RunTypeRegistry.choices()
 
 @login_required
 def run(request, pk):

@@ -173,6 +173,7 @@ class RolePermission(models.Model):
 class RunType(models.Model):
     id = models.SlugField(max_length=20, blank=False, primary_key=True)
     name = models.CharField(max_length=50, db_index=True)
+    enabled = models.BooleanField(default=True)
     def __str__(self):
         return self.name
 

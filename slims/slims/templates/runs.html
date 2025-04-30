@@ -8,8 +8,8 @@
         </a>
       
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          {% for id, name in run_types %}
-          <li><a class="dropdown-item" href="{% url 'create_run' run_type=id %}">{{name}}</a></li>
+          {% for run_type in run_types %}
+          <li><a class="dropdown-item" href="{% url 'create_run' run_type=run_type.id %}">{{run_type.name}}</a></li>
           {% endfor %}
         </ul>
       </div>
@@ -23,7 +23,7 @@
             <th>Machine</th>
             <th>Run Directory</th>
             <!-- <th># Cycles</th> -->
-            <th># Pools/ Containers</th>
+            <th># Pools</th>
             <th>Description</th>
         </tr>
     </thead>

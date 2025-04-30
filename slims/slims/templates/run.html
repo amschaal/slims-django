@@ -11,6 +11,9 @@
         {% endif %}
         <h3>General Data</h3>
         <table class="table">
+            {% if run.type %}
+            <tr><th>Type</th><td>{{run.type.name}}</td></tr>
+            {% endif %}
             {% if run.run_type %}
             <tr><th>Run Type</th><td>{{run.run_type}}</td></tr>
             {% endif %}
@@ -28,7 +31,7 @@
 </div>
 <div class="card mt-2">
     <div class="card-body">
-        <h3 class="card-title">Pools/Containers</h3>
+        <h3 class="card-title">Pools</h3>
         {% if user.is_staff %}
         <a class="btn btn-primary" href="{% url 'run_data' pk=run.pk %}">Manage Data</a>
         {% endif %}
