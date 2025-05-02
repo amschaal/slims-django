@@ -40,7 +40,7 @@ class RunViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RunSerializer
     ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'type', 'num_cycles', 'run_dir']
     ordering = ['run_date']
-    search_fields = ['run_date', 'machine__name', 'machine__id', 'submitted', 'run_type', 'type__name', 'type__id', 'run_dir', 'description']
+    search_fields = ['run_date', 'machine__name', 'machine__id', 'submitted', 'run_type', 'type__name', 'type__id', 'run_dir', 'description', 'lanes__submission__internal_id']
 
 class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]

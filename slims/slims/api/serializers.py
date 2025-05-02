@@ -35,6 +35,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class RunSerializer(serializers.ModelSerializer):
     num_lanes = serializers.IntegerField(read_only=True)
     can_modify = serializers.BooleanField(read_only=True)
+    submission_ids = serializers.SerializerMethodField()
+    def get_submission_ids(self, instance):
+        return [l.submission.internal_id or l.submission.id for l in instance.lanes.all() if l.submission]
     class Meta:
         model = Run
         exclude = []
