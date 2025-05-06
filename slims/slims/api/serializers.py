@@ -32,12 +32,17 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'groups', 'is_pi']
 
+class BasicSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['id', 'internal_id', 'pi_name', 'submitted']
+
 class RunSerializer(serializers.ModelSerializer):
     num_lanes = serializers.IntegerField(read_only=True)
     can_modify = serializers.BooleanField(read_only=True)
-    submission_ids = serializers.SerializerMethodField()
-    def get_submission_ids(self, instance):
-        return [l.submission.internal_id or l.submission.id for l in instance.lanes.all() if l.submission]
+    submissions = serializers.SerializerMethodField()
+    def get_submissions(self, instance):
+        return BasicSubmissionSerializer([l.submission for l in instance.lanes.filter(submission__isnull=False).distinct()], many=True).data
     class Meta:
         model = Run
         exclude = []
@@ -55,11 +60,6 @@ class LaneDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaneData
         exclude = []
-
-class BasicSubmissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Submission
-        fields = ['id', 'internal_id', 'pi_name', 'submitted']
 
 class RunLaneDetailSerializer(RunLaneSerializer):
     directories = LaneDataSerializer(many=True, read_only=True)

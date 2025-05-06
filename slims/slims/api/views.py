@@ -36,7 +36,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({'users': UserDetailSerializer(users, many=True).data})
 
 class RunViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Run.objects.all().annotate(num_lanes=Count('lanes'))
+    queryset = Run.objects.all().annotate(num_lanes=Count('lanes')).prefetch_related('lanes', 'lanes__submission')
     serializer_class = RunSerializer
     ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'type', 'num_cycles', 'run_dir']
     ordering = ['run_date']

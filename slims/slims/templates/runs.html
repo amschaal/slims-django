@@ -54,10 +54,12 @@
                  },
                 { data: "description", sortable: false },
                 {
-                    data: 'submission_ids',
+                    data: 'submissions',
                     sortable: false,
                     render: function (data, type, row) {
-                        return data
+                        return data ? data.map(s => {
+                            return'<a href="/submissions/' + s.id + '/">' + (s.internal_id || s.id) + '</a>'
+                        }).join(', ') : '';
                     }
                 },
                 {
