@@ -38,7 +38,11 @@
                         return '<a target="_blank" href="' + row.url + '/">'+ (data || row.id)+'</a>'
                     }
                 },
-                { data: "submission_type" },
+                { data: "submission_type",
+                    render: function (data, type, row) {
+                        return '<span class="d-inline-block text-truncate" style="max-width: 200px;">' +data+'</span>'
+                    }
+                },
                 { data: "submitter_name" },
                 { data: "submitter_email" },
                 { data: "pi_name" },

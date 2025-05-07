@@ -116,7 +116,7 @@ class RunLaneForm(forms.ModelForm):
             'lane_dir': 'Pool Directory'
         }
         model = RunLane
-        fields = ["lane_number", "submission", "project_id", "lane_dir", "description"]#, "group"
+        fields = ["lane_number", "submission", "lane_dir", "description"]#, "group"
 
 class SLIMSLaneForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
