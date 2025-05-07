@@ -1,8 +1,9 @@
 from django.db import models
-from .settings import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP
+from .settings import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESYSTEM_ID, DEFAULT_GROUP, TEST
 from coreomics.models import Submission
 from .requests import bioshare_post, bioshare_get, create_share, link_data
 from django.utils import timezone
+from django.conf import settings
 
 class SubmissionShare(models.Model):
     ADMIN_PERMISSIONS = ["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]
@@ -16,9 +17,12 @@ class SubmissionShare(models.Model):
     updated = models.DateTimeField(null=True)
     def save(self, *args, **kwargs):
         if not self.name:
-            self.name = '{}: {}'.format(self.submission.pi_name,self.submission.internal_id)
+            if TEST:
+                self.name = 'TEST: {}: {}'.format(self.submission.pi_name, self.submission.internal_id or self.submission.id)
+            else:
+                self.name = '{}: {}'.format(self.submission.pi_name, self.submission.internal_id or self.submission.id)
         if not self.notes:
-            self.notes = 'Generated from {}'.format(self.submission.internal_id)
+            self.notes = '{}Created for submission: {}, Submitter: {}, PI: {}'.format('TEST: ' if TEST else '',self.submission.internal_id or self.submission.id, self.submission.submitter_name, self.submission.pi_name)
         if not self.bioshare_id:
             # name = self.name or '{}: {}'.format(self.submission.pi_name,self.submission.internal_id)
             # notes = self.notes or 
@@ -36,6 +40,12 @@ class SubmissionShare(models.Model):
     @property
     def url(self):
         return VIEW_URL.format(id=self.bioshare_id)
+    @property
+    def participants(self):
+        return self.submission.data.get('participants', [])
+    @property
+    def contacts(self):
+        return self.submission.data.get('contacts', [])
     def set_permissions(self, perms=None):
 #         if not perms:
 #             perms = {"test": True, "groups": {}, "users":dict([(p.email,["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]) for p in self.submission.participants.all()]), "email":True}
@@ -49,21 +59,21 @@ class SubmissionShare(models.Model):
         self.updated = timezone.now()
         self.save(update_fields=['permissions', 'updated'])
     def share_with_participants(self, email=False):
-        perms = {"groups": {}, "users":dict([(p.email, self.ADMIN_PERMISSIONS) for p in self.submission.data['participants']]), "email":email}
+        perms = {"groups": {}, "users":dict([(p.email, self.ADMIN_PERMISSIONS) for p in self.participants]), "email":email}
         return self.set_permissions(perms)
     def share_with_group(self, email=False):
         if DEFAULT_GROUP:
             perms = {"groups": {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}, "email":email}
             return self.set_permissions(perms)
     def share_with_group_and_participants(self, email=False):
-        perms = {"users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.submission.data['participants']]), "email":email}
+        perms = {"users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.participants]), "email":email}
         if DEFAULT_GROUP:
             perms["groups"] = {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}
         return self.set_permissions(perms)
     def share(self, contacts=True, email=False):
         emails = [self.submission.submitter_email, self.submission.pi_email]
         if contacts:
-            emails += [c['email'] for c in self.submission.data.get('contacts',[])]
+            emails += [c['email'] for c in self.contacts]
         perms = {"groups": {}, "users":dict([(email,self.VIEWER_PERMISSIONS) for email in emails]), "email":email}
         return self.set_permissions(perms)
     def update_permissions(self):

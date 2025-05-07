@@ -8,3 +8,4 @@ SYMLINK_URL = settings.BIOSHARE_BASE_URL + '/bioshare/create_symlink/{id}/'
 DEFAULT_GROUP = getattr(settings,'BIOSHARE_DEFAULT_GROUP',None)
 AUTH_TOKEN = settings.BIOSHARE_TOKEN
 FILESYSTEM_ID = settings.BIOSHARE_FILESYSTEM_ID
+TEST = settings.BIOSHARE_TEST
