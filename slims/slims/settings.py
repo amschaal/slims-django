@@ -155,4 +155,9 @@ LOGIN_REDIRECT_URL = '/profile/'
 
 RUN_TYPE_OPTIONS = {}
 
+
+BIOSHARE_TEST = False # Use in test mode
+
+EXCLUDE_SUBMISSION_TYPES = [] # Use submission type.id or type.prefix
+
 from .config import *

@@ -192,6 +192,7 @@ class Machine(models.Model):
 class Run(models.Model):
     type = models.ForeignKey(RunType, null=True, on_delete=models.RESTRICT)
     run_id = models.AutoField(primary_key=True)
+    unique_id = models.CharField(max_length=25, null=True, blank=True, unique=True)
     description = models.TextField(blank=True, null=True)
     submitted = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     num_cycles = models.IntegerField(blank=True, null=True)

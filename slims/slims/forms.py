@@ -34,9 +34,12 @@ class RunForm(forms.ModelForm):
 
     class Meta:
         model = Run
-        fields = ["type", "run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["unique_id", "type", "run_date", "machine", "run_dir", "description", "notes"]
         widgets = {
             'run_date': forms.DateInput(attrs={'type': 'date'})
+        }
+        labels = {
+            'unique_id': 'Run ID'
         }
 
 class PacbioRunForm(RunForm):

@@ -4,6 +4,7 @@ from .models import Submission
 from datetime import date, timedelta
 
 def import_submissions(days=30):
+    exclude_types = getattr(settings, 'EXCLUDE_SUBMISSION_TYPES', [])
     last_updated = date.today() - timedelta(days=days)
     # TODO: change this to filtering by updated, not submitted date in order to catch updates in submission.  Need to make this filter (updated__date__gte) available in Coreomics first....
     url = '{base_url}/server/api/submissions/?page=1&page_size=100&lab=dnatech&submitted__date__gte={last_updated}'.format(base_url=settings.COREOMICS_BASE_URL, last_updated=str(last_updated)) #updated__date__gte={last_updated}
@@ -16,8 +17,9 @@ def import_submissions(days=30):
         data = json.loads(response.read())
         # updated = []
         for submission in data['results']: #do something with submissions
-            instance = Submission.import_submission(submission)
-            imported.append(instance)
+            if submission['type']['id'] not in exclude_types and submission['type']['prefix'] not in exclude_types:
+                instance = Submission.import_submission(submission)
+                imported.append(instance)
         url = data['next']
     print('{} submissions imported or updated'.format(len(imported)))
 
