@@ -7,3 +7,12 @@
 .status-COMPLETE {
     color: green;
 }
+input[type=checkbox] {
+    border-radius: 0.25em;
+    background-color: #ddd;
+    border-color: #ccc;
+}
+:root,
+[data-bs-theme=light] {
+  --bs-dark-rgb: 2, 40, 81;
+}

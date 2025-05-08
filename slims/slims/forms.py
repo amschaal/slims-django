@@ -108,7 +108,7 @@ class RunLaneForm(forms.ModelForm):
     #     return submission
     class Meta:
         widgets = {
-            'lane_number': forms.NumberInput({'class': 'lane-input'}),
+            'lane_number': forms.NumberInput({'class': 'lane-input', 'min': 1}),
             'submission': Select2Widget(attrs={'class': 'select2', 'config': 'submission'})
         }
         labels = {
@@ -125,7 +125,7 @@ class SLIMSLaneForm(forms.ModelForm):
         self.fields['lane_number'].required = True
     class Meta:
         widgets = {
-            'lane_number': forms.NumberInput({'class': 'lane-input'}),
+            'lane_number': forms.NumberInput({'class': 'lane-input', 'min': 1}),
             'group': Select2Widget(attrs={'class': 'select2', 'config': 'group'})
         }
         labels = {

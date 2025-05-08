@@ -18,6 +18,7 @@
             <th>Submitter Email</th>
             <th>PI</th>
             <th>PI Email</th>
+            <th>Links</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -49,20 +50,21 @@
                 { data: "pi_email" },
                 {
                     data: 'id',
+                    sortable: false,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>';
-                    }
-                },
-                {
-                    data: 'id',
-                    render: function (data, type, row) {
+                        var html = '<a class="btn btn-primary me-2" href="/submissions/' + data + '/">Details</a>';
                         if (row.share && row.share.url) {
-                            return '<a class="btn btn-primary" href="'+row.share.url+'">Share</a>';
+                            html += '<a class="btn btn-primary" href="'+row.share.url+'">Share</a>';
                         }
-                        return '';
+                        return html;
                     }
                 }
             ],
+            layout: {
+                topStart: {
+                    buttons: ['colvis']
+                }
+            },
             processing: true,
             serverSide: true,
             ajax: {
