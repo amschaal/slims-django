@@ -42,6 +42,7 @@ urlpatterns = [
     path("groups/<int:pk>/", views.group, name="group"),
     path("submissions/", views.submissions, name="submissions"),
     path("submissions/<slug:pk>/", views.submission, name="submission"),
+    path("submissions/<slug:pk>/update/", views.submission, kwargs={ 'update': True }, name="update_submission"),
     path("submissions/<slug:pk>/create_share/", views.create_submission_share, name="create_submission_share"),
     # path("submissions/<slug:submission_id>/share_data/", views.share_data, name="share_submission_data"),
     path('api/', include(router.urls)),

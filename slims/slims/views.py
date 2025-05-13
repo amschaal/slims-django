@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
-from coreomics.utils import import_submissions
+from coreomics.utils import import_submission, import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane, RunType
 from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
@@ -94,8 +94,11 @@ def submissions(request):
     return render(request, "submissions.html")
 
 @user_passes_test(lambda u: u.is_staff)
-def submission(request, pk):
-    submission = Submission.objects.get(pk=pk)
+def submission(request, pk, update=False):
+    if update:
+        submission = import_submission(pk)
+    else:
+        submission = Submission.objects.get(pk=pk)
     if hasattr(submission,'share'):
         submission.share.share_with_group_and_participants()
     return render(request, "submission.html", {"submission": submission})

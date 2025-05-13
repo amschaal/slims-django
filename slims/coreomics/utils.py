@@ -23,6 +23,16 @@ def import_submissions(days=30):
         url = data['next']
     print('{} submissions imported or updated'.format(len(imported)))
 
+def import_submission(id):
+    url = '{base_url}/server/api/submissions/{id}/'.format(base_url=settings.COREOMICS_BASE_URL, id=id) #updated__date__gte={last_updated}
+    print(url)
+    req = urllib.request.Request(url)
+    req.add_header('Authorization', 'Token {token}'.format(token=settings.COREOMICS_TOKEN))
+    response = urllib.request.urlopen(req)
+    data = json.loads(response.read())
+    submission = Submission.import_submission(data)
+    return submission
+
 def link_share(submission, share):
     url = '{base_url}/server/api/plugins/bioshare/submissions/{submission_id}/submission_shares/import_share/'.format(base_url=settings.COREOMICS_BASE_URL,submission_id=submission.id)
     data = { "url": share.url }

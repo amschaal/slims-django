@@ -3,6 +3,7 @@
 <div class="card mt-2">
     <div class="card-body">
         <h3 class="card-title"><a href="{% url 'submissions' %}">Submissions</a> / {{submission.internal_id}}</h3>
+        <a href="{% url 'update_submission' pk=submission.pk%}" class="btn btn-primary">Update</a>
         <table class="table">
             <tr><th>Submitted</th><td>{{submission.submitted}}</td></tr>
             <tr><th>Type</th><td>{{submission.submission_type}}</td></tr>
