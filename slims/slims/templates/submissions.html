@@ -52,9 +52,9 @@
                     data: 'id',
                     sortable: false,
                     render: function (data, type, row) {
-                        var html = '<a class="btn btn-primary me-2" href="/submissions/' + data + '/">Details</a>';
+                        var html = '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>';
                         if (row.share && row.share.url) {
-                            html += '<a class="btn btn-primary" href="'+row.share.url+'">Share</a>';
+                            html = '<div class="d-flex">' + html + '<a class="btn btn-primary ms-2" href="'+row.share.url+'">Share</a></div>';
                         }
                         return html;
                     }

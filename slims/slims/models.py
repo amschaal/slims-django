@@ -205,6 +205,7 @@ class Run(models.Model):
     request_transfer = models.IntegerField(blank=True, null=True)
     last_transfer = models.DateTimeField(blank=True, null=True)
     run_type = models.CharField(max_length=15, blank=True, null=True)
+    metadata = models.JSONField(default=dict)
     def ordered_lanes(self, user=None):
         lanes = self.lanes.all().order_by('lane_number')
         if user and not user.is_staff:
@@ -226,6 +227,15 @@ class Run(models.Model):
         # return RunTypeRegistry.get(self.run_type)(self)
     def get_machine(self):
         return self.machine_name or self.machine
+    def update_data_status(self, save=True):
+        statuses = {}
+        for d in LaneData.objects.filter(lane__run=self):
+            if d.status not in statuses:
+                statuses[d.status] = 0
+            statuses[d.status] += 1
+        self.metadata['data_status'] = statuses
+        if save:
+            self.save()
     def __str__(self):
         return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.machine or ''))
     class Meta:

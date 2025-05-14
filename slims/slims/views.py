@@ -59,6 +59,7 @@ def edit_run(request, pk=None, run_type=None):
             lane_formset = run.run_class.lane_formset(request.POST, instance=run)
             lane_formset.is_valid()
             lane_formset.save()
+            run.update_data_status()
             return redirect('run', pk=run.pk)
 
     return render(request, run.run_class.run_form_template, { "run_form": run_form, "lane_formset": lane_formset, "run": run, "helper": helper})
@@ -103,19 +104,19 @@ def submission(request, pk, update=False):
         submission.share.share_with_group_and_participants()
     return render(request, "submission.html", {"submission": submission})
 
-@user_passes_test(lambda u: u.is_staff)
-def share_data(request, run_id):
-    run = Run.objects.get(pk=run_id)
-    data_ids = request.POST.getlist('data')
-    # raise Exception('data', data_ids, request.POST['action'])
-    data = LaneData.objects.filter(lane__run_id=run_id, id__in=data_ids)
-    shares_created = []
-    for d in data:
-        d.status_before = d.status
-        if not hasattr(d.lane.submission, 'share'):
-            shares_created.append(d.lane.submission.create_share())
-        d.share()
-    return render(request, "share_data.html", {"data": data, "run_id": run_id, "shares_created": shares_created})
+# @user_passes_test(lambda u: u.is_staff)
+# def share_data(request, run_id):
+#     run = Run.objects.get(pk=run_id)
+#     data_ids = request.POST.getlist('data')
+#     # raise Exception('data', data_ids, request.POST['action'])
+#     data = LaneData.objects.filter(lane__run_id=run_id, id__in=data_ids)
+#     shares_created = []
+#     for d in data:
+#         d.status_before = d.status
+#         if not hasattr(d.lane.submission, 'share'):
+#             shares_created.append(d.lane.submission.create_share())
+#         d.share()
+#     return render(request, "share_data.html", {"data": data, "run_id": run_id, "shares_created": shares_created})
 
 @user_passes_test(lambda u: u.is_staff)
 def run_data(request, pk):
@@ -130,6 +131,7 @@ def run_data(request, pk):
                 if not hasattr(d.lane.submission, 'share'):
                     context["shares_created"].append(d.lane.submission.create_share())
                 d.share()
+        run.update_data_status()
     # elif action == 'delete':
     #     context['deleted'] = filtered_data.exclude(status=LaneData.STATUS_COMPLETE).delete()
     context['data'] = LaneData.objects.filter(lane__run=run)
@@ -152,6 +154,7 @@ def create_edit_lanedata(request, lane_id=None, pk=None):
     if request.method == 'POST':
         if form.is_valid():
             lane_data = form.save()
+            lane_data.lane.run.update_data_status()
             return redirect('run_data', pk=lane.run.pk)
     return render(request, 'run_forms/run_data_form.html', { "form": form, "lane": lane})
 
@@ -159,7 +162,9 @@ def create_edit_lanedata(request, lane_id=None, pk=None):
 def delete_lanedata(request, pk=None):
     instance = LaneData.objects.get(pk=pk)
     if instance.can_delete:
+        run = instance.lane.run
         instance.delete()
+        run.update_data_status()
     return redirect('run_data', pk=instance.lane.run.pk)
 
 # @user_passes_test(lambda u: u.is_staff)

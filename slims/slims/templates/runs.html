@@ -25,6 +25,7 @@
             <th># Pools</th>
             <th>Submissions</th>
             <th>Description</th>
+            <th>Data Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -59,6 +60,22 @@
                     }
                 },
                 { data: "description", sortable: false },
+                {
+                    data: 'metadata',
+                    sortable: false,
+                    render: function (data, type, row) {
+                        if (!data || !data.data_status) {
+                            return ''
+                        }
+                        var statuses = [];
+                        for (const [key, value] of Object.entries(data.data_status)) {
+                            if (value > 0) {
+                                statuses.push('<span class="status-'+key+'">'+value+' '+key+'</span>')
+                            }
+                        }
+                        return statuses.join(', ')
+                    }
+                },
                 {
                     data: null,
                     sortable: false,

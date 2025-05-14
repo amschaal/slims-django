@@ -3,7 +3,6 @@ from .settings import VIEW_URL, GET_PERMISSIONS_URL, SET_PERMISSIONS_URL, FILESY
 from coreomics.models import Submission
 from .requests import bioshare_post, bioshare_get, create_share, link_data
 from django.utils import timezone
-from django.conf import settings
 
 class SubmissionShare(models.Model):
     ADMIN_PERMISSIONS = ["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]
