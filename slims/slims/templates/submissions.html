@@ -36,7 +36,7 @@
                 },
                 { data: "internal_id",
                     render: function (data, type, row) {
-                        return '<a target="_blank" href="' + row.url + '/">'+ (data || row.id)+'</a>'
+                        return data || row.id;
                     }
                 },
                 { data: "submission_type",
@@ -52,11 +52,11 @@
                     data: 'id',
                     sortable: false,
                     render: function (data, type, row) {
-                        var html = '<a class="btn btn-primary" href="/submissions/' + data + '/">Details</a>';
+                        var html = '<div class="d-flex"><a class="btn btn-primary btn-sm" href="/submissions/' + data + '/">Details</a> <a class="btn btn-primary btn-sm ms-2 d-flex" href="' + row.url + '/">CoreOmics <i class="mt-1 ms-1 fa-solid fa-up-right-from-square"></i></a>';
                         if (row.share && row.share.url) {
-                            html = '<div class="d-flex">' + html + '<a class="btn btn-primary ms-2" href="'+row.share.url+'">Share</a></div>';
+                            html += '<a class="btn btn-primary btn-sm ms-2 d-flex" href="'+row.share.url+'">Bioshare <i class="mt-1 ms-1 fa-solid fa-up-right-from-square"></i></a></div>';
                         }
-                        return html;
+                        return html + '</div>';
                     }
                 }
             ],

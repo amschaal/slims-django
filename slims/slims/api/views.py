@@ -9,6 +9,7 @@ from rest_framework import routers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().prefetch_related('groups', 'user_permissions')
@@ -97,7 +98,7 @@ class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'])
     def share_with_clients(self, request, pk=None):
         share = self.get_object()
-        share.share()
+        share.share(email=settings.BIOSHARE_EMAIL_CLIENT)
         share.submission.link_share()
         return Response(BioshareSerializer(share).data)
 

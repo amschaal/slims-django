@@ -40,14 +40,14 @@ class Submission(models.Model):
         submission = Submission(id=serialized['id'], submitted=serialized['submitted'])
         submission.update(serialized, commit=True)
         return submission
-    def create_share(self):
+    def create_share(self, email=False):
         from bioshare.models import SubmissionShare
         if hasattr(self, 'share'):
             return self.share
         share = SubmissionShare(submission=self)
         share.save()
         # share.update_permissions()
-        share.share_with_group_and_participants()
+        share.share_with_group_and_participants(email=email)
         return share
     def link_share(self):
         from .utils import link_share
