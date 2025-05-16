@@ -1,7 +1,7 @@
 <h2>
-    Run History
+    Run History <a class="btn btn-primary" href="/api/profile_lanes/to_csv/{% if profile_user %}?user_id={{profile_user.pk}}{% elif group %}?group_id={{group.id}}{% endif %}">Export CSV</a>
 </h2>
-<table id="runs" class="table table-striped" style="width:100%">
+<table id="runs" class="table table-striped table-sm" style="width:100%">
     <thead>
         <tr>
             <th>Run Date</th>
@@ -26,7 +26,7 @@
         $('#runs').DataTable({
             columns: [
                 { data: "run.run_date", render: DataTable.render.date() },
-                { data: "run.machine" },
+                { data: "run.machine_name" },
                 { data: "lane_number" },
                 {
                     data: "group",

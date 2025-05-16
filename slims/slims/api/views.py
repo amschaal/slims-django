@@ -1,3 +1,5 @@
+import csv
+from datetime import datetime
 from django.urls import path, include
 from django.contrib.auth.models import User, Group
 from django.db.models import Count
@@ -10,6 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
+from django.http import HttpResponse
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().prefetch_related('groups', 'user_permissions')
@@ -52,9 +55,9 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
         group_id = self.request.query_params.get('group_id', None)
         if group_id:
             if self.request.user.is_staff:
-                return RunLane.objects.filter(group_id=group_id)
+                return RunLane.objects.filter(group_id=group_id).select_related('run', 'group')
             else:
-                return RunLane.objects.filter(group__in=user.groups.filter(id=group_id))
+                return RunLane.objects.filter(group__in=user.groups.filter(id=group_id)).select_related('run', 'group')
         if user_id and self.request.user.is_staff:
             user = User.objects.get(id=user_id)
         return RunLane.get_user_lanes(user)
@@ -62,7 +65,20 @@ class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     # ordering_fields = ['run__run_date', 'machine', 'submitted', 'run_type', 'num_cycles', 'run_dir']
     filterset_fields = { 'submission__id':['exact'], 'submission__internal_id':['exact']}
     ordering = ['-run__run_date', 'run__run_id']
-    search_fields = ['run__run_date', 'run__machine', 'run__submitted', 'run__run_type', 'run__description', 'description', 'lane_number', 'group__name']
+    search_fields = ['run__run_date', 'run__machine_name', 'run__run_type', 'run__description', 'description', 'lane_number', 'group__name']
+    @action(detail=False, methods=['get'])
+    def to_csv(self, request):
+        qs = self.get_queryset().order_by('-run__run_date')
+        response = HttpResponse(content_type='text/csv')
+        now = datetime.now()
+        date_str = now.strftime('%Y-%m-%d_%H-%M-%S')
+        response['Content-Disposition'] = 'attachment; filename="runs_export_{}.csv"'.format(date_str)
+        writer = csv.writer(response)
+        writer.writerow(['Run Date','Machine', 'Group', 'Number of Cycles', 'Description', 'Data URL'])
+        for l in RunLaneSerializer(qs, many=True).data:
+            writer.writerow([l['run']['run_date'], l['run']['machine_name'], l['group']['name'], l['run']['num_cycles'], l['description'], l['data_url']])
+        return response
+
 
 class RunLaneViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RunLaneDetailSerializer
