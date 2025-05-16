@@ -23,7 +23,7 @@ class SLIMSRunForm(forms.ModelForm):
 class RunForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        required_fields = ["machine"]
+        required_fields = ["machine","run_date"]
         self.fields['type'].disabled = True
         self.fields['description'].widget.attrs['rows']=2
         self.fields['notes'].widget.attrs['rows']=2
