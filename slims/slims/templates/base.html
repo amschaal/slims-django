@@ -89,5 +89,12 @@
     <img style="height:100px;" src="{% static 'images/dnatech.png' %}"/>
   </footer>
 </div>
+<script>
+  // Enable Bootstrap 5 tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
 </body>
 </html>
