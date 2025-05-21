@@ -42,7 +42,12 @@
                     render: DataTable.render.date(),
                     visible: false
                 },
-                { data: "run_date", render: DataTable.render.date()},
+                { 
+                    data: "run_date", 
+                    render: function (data, type, row) {
+                        return moment(data).format('M/D/YYYY');
+                    }
+                },
                 { data: "type" },
                 { data: "machine" },
                 { data: "run_dir", sortable: false, visible: false },

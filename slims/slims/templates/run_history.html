@@ -25,7 +25,12 @@
     $(document).ready(function () {
         $('#runs').DataTable({
             columns: [
-                { data: "run.run_date", render: DataTable.render.date() },
+                { 
+                    data: "run.run_date", 
+                    render: function (data, type, row) {
+                        return moment(data).format('M/D/YYYY');
+                    }
+                },
                 { data: "run.machine_name" },
                 { data: "lane_number" },
                 {
