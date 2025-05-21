@@ -100,8 +100,8 @@ def submission(request, pk, update=False):
         submission = import_submission(pk)
     else:
         submission = Submission.objects.get(pk=pk)
-    if hasattr(submission,'share'):
-        submission.share.share_with_group_and_participants()
+    # if hasattr(submission,'share'):
+    #     submission.share.share_with_group_and_participants()
     return render(request, "submission.html", {"submission": submission})
 
 # @user_passes_test(lambda u: u.is_staff)

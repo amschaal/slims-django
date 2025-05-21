@@ -117,6 +117,11 @@ class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
         share.share(email=settings.BIOSHARE_EMAIL_CLIENT)
         share.submission.link_share()
         return Response(BioshareSerializer(share).data)
+    @action(detail=True, methods=['post'])
+    def update_share(self, request, pk=None):
+        share = self.get_object()
+        share.update_share()
+        return Response(BioshareSerializer(share).data)
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()

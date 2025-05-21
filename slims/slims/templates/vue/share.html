@@ -1,7 +1,7 @@
 <div id="app">
     <div class="card mt-2" style="width: 100%;">
         <div class="card-body">
-            <h3 class="card-title">Share</h3>
+            <h3 class="card-title">Share <button class="btn btn-primary" v-if="share" @click="updateShare" title="Sync the latest share details and permissions from Bioshare">Update</button></h3>
             <div v-if="id && share">
                 <!-- [[id]]
                 [[share]] -->
@@ -55,6 +55,11 @@
                 this.share = response.data
                 alert('Successfully shared with clients.')
             })
+        },
+        updateShare () {
+            axios.post(`/api/submission_shares/${this.id}/update_share/`, {}, axios_headers).then(response =>
+                this.share = response.data
+            )
         }
       },
       computed: {
