@@ -19,6 +19,7 @@
         <tr>
             <th>Created</th>
             <th>Run date</th>
+            <th>Run ID</th>
             <th>Type</th>
             <th>Machine</th>
             <th>Run Directory</th>
@@ -47,6 +48,10 @@
                     render: function (data, type, row) {
                         return moment(data).format('M/D/YYYY');
                     }
+                },
+                { 
+                    data: "unique_id",
+                    visible: false
                 },
                 { data: "type" },
                 { data: "machine" },

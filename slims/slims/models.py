@@ -237,7 +237,7 @@ class Run(models.Model):
         if save:
             self.save()
     def __str__(self):
-        return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.machine or ''))
+        return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.unique_id or self.machine or ''))
     class Meta:
         managed = True
         db_table = 'run'
