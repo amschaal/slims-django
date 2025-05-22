@@ -53,4 +53,8 @@ class Submission(models.Model):
         from .utils import link_share
         if hasattr(self, 'share'):
             link_share(self, self.share)
+    def create_note(self, note):
+        from .utils import create_note
+        return create_note(self, note)
+
         

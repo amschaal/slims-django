@@ -46,3 +46,14 @@ def link_share(submission, share):
         error_message = e.read()
         raise Exception(error_message)
     return response
+
+def create_note(submission, text):
+    url = '{base_url}/server/api/notes/'.format(base_url=settings.COREOMICS_BASE_URL)
+    data = {"type":"NOTE","submission":submission.id,"send_email":True,"email_participants":False,"public":True,"edit":True,"parent":None,"text":text}
+    params = json.dumps(data).encode('utf8')
+    req = urllib.request.Request(url, data=params)
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Authorization', 'Token {token}'.format(token=settings.COREOMICS_TOKEN))
+    response = urllib.request.urlopen(req)
+    data = json.loads(response.read())
+    return data
