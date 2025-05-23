@@ -45,6 +45,20 @@ class RunViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ['run_date', 'machine', 'submitted', 'run_type', 'type', 'num_cycles', 'run_dir']
     ordering = ['run_date']
     search_fields = ['run_date', 'machine__name', 'machine__id', 'submitted', 'run_type', 'type__name', 'type__id', 'run_dir', 'description', 'lanes__submission__internal_id']
+    @action(detail=True, methods=['post'])
+    def send_message(self, request, pk=None):
+        note = request.data.get('note')
+        run = self.get_object()
+        submissions = Submission.objects.filter(lanes__run=run).distinct()
+        notes_sent = []
+        notes_failed = []
+        for submission in submissions:
+            try:
+                response = submission.create_note(note)
+                notes_sent.append(submission.submission_id)
+            except:
+                notes_failed.append(submission.submission_id)
+        return Response({'note': note, 'sent': notes_sent, 'failed': notes_failed, 'run': RunSerializer(run).data, 'submissions': SubmissionSerializer(submissions, many=True).data})
 
 class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]

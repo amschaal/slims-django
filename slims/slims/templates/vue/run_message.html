@@ -1,0 +1,65 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#messageModal">
+    Send Message
+</button>
+  
+  <!-- Modal -->
+  <div class="modal fade modal-xl" id="messageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" id="app">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Add a message to submissions.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-floating">
+                <textarea class="form-control" placeholder="Enter a note to add to each submission." v-model="note"></textarea>
+                <label for="floatingTextarea">Message</label>
+            </div>
+            <!-- [[note]] -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" @click="messageClients">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // const { createApp } = Vue;
+    createApp({
+      el: '#app',
+      delimiters: ['[[', ']]'],
+      data() {
+        return {
+            run: {{run.pk}},
+            templates: [],
+            note: '',
+            response: null
+            };
+        },
+      mounted () {
+        if (this.id) {
+            axios.get(`/api/templates/`).then(response =>
+                this.templates = response.data
+            )
+        }
+      },
+      methods: {
+        messageClients () {
+            axios.post(`/api/runs/${this.run}/send_message/`, {'note': this.note}, axios_headers).then(response => {
+                this.response = response.data
+                var failed = '', sent = '';
+                if (response.data.sent.length) {
+                    sent = 'Note sent to submission(s): ' + response.data.sent.join(', ') + '\n';
+                }
+                if (response.data.failed.length) {
+                    failed = 'Note failed to send to submission(s): ' + response.data.failed.join(', ');
+                }
+                alert(sent + failed);
+            })
+        }
+      }
+    }).mount('#app')
+  </script>

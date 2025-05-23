@@ -74,6 +74,9 @@
 {% if user.is_staff and 0%}
 {% include 'vue/lanes.html' %}
 {% endif %}
+{% if user.is_staff%}
+{% include 'vue/run_message.html' with run=run %}
+{% endif %}
 <script>
     let delete_url = "{% url 'delete_run' pk=run.pk %}";
     function delete_run() {

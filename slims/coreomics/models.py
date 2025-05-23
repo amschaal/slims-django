@@ -17,6 +17,9 @@ class Submission(models.Model):
         ordering = ('-submitted',)
     def __str__(self):
         return str(self.submitted)[:10] + ': ' + (self.internal_id or self.id)
+    @property
+    def submission_id(self):
+        return self.internal_id or self.id
     def update(self, data=None, commit=True):
         if data:
             # print(data['updated'], self.data)
