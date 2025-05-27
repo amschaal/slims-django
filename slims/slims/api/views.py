@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Count
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
+from coreomics.utils import format_note
 from slims.models import Run, RunLane, LaneData
 from .serializers import BioshareSerializer, UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer, RunLaneDetailSerializer, LaneDataSerializer
 from rest_framework import routers, viewsets
@@ -53,12 +54,13 @@ class RunViewSet(viewsets.ReadOnlyModelViewSet):
         notes_sent = []
         notes_failed = []
         for submission in submissions:
+            formatted_note = format_note(note, submission, LaneData.objects.filter(lane__run=run, lane__submission=submission, status=LaneData.STATUS_COMPLETE))
             try:
-                response = submission.create_note(note)
-                notes_sent.append(submission.submission_id)
+                response = submission.create_note(formatted_note)
+                notes_sent.append((submission.submission_id, formatted_note))
             except:
                 notes_failed.append(submission.submission_id)
-        return Response({'note': note, 'sent': notes_sent, 'failed': notes_failed, 'run': RunSerializer(run).data, 'submissions': SubmissionSerializer(submissions, many=True).data})
+        return Response({'sent': notes_sent, 'failed': notes_failed, 'run': RunSerializer(run).data, 'submissions': SubmissionSerializer(submissions, many=True).data})
 
 class RunLaneProfileViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
