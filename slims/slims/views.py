@@ -167,6 +167,13 @@ def delete_lanedata(request, pk=None):
         run.update_data_status()
     return redirect('run_data', pk=instance.lane.run.pk)
 
+@user_passes_test(lambda u: u.is_staff)
+def run_messages(request, pk):
+    run = Run.objects.get(pk=pk)
+    pools = request.POST.getlist('pools') # get pool ids to send messages for
+    context = {"run": run, "lanes": RunLane.objects.filter(run=run)}
+    return render(request, "run_messages.html", context)
+
 # @user_passes_test(lambda u: u.is_staff)
 # def edit_run_data(request, pk):
 #     lanes = RunLane.objects.filter(run_id=pk)

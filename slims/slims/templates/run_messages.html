@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block 'content' %}
+<h3 class="card-title"><a href="{% url 'runs' %}">Runs</a> / <a href="{% url 'run' pk=run.pk %}">{{run}}</a> / Messages</h3>
+<div class="card mt-2">
+    <div class="card-body">
+        <h3 class="card-title">Message</h3>
+        <textarea class="form-control" placeholder="Enter a note to add to each submission." v-model="note"></textarea>
+        <h3 class="card-title">Select Pools</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Select</th><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
+            </thead>
+            <tbody>
+                {% for l in lanes %}
+                    {% if l.submission %}
+                    <tr submission="{{l.submission.id}}">
+                        <td><input type="checkbox" name="pools"></td>
+                        <td>{{l.lane_number}}</td>
+                        <td>{{l.pi_name}}</td>
+                        {% if user.is_staff %}
+                        <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
+                        {% endif %}
+                        <td>{{l.project_id}}</td>
+                        <td>{{l.lane_dir}}</td>
+                        <td>{{l.description}}</td>
+                        <td>
+                            {% for status, directories in l.grouped_directories.items %}
+                                <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
+                            {% endfor %}
+                        </td>
+                        <td>{% if l.data_url %}<a href="{{l.data_url}}" class="btn btn-primary">Data</a>{% endif %}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% endblock %}
