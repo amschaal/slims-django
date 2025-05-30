@@ -8,7 +8,7 @@ from bioshare.models import SubmissionShare
 from coreomics.utils import import_submission, import_submissions
 from .run_type import RunTypeRegistry
 from .models import LaneData, Run, RunLane, RunType
-from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm
+from .forms import RunForm, LaneFormSet, RunLaneHelper, LaneDataForm, RunMessageForm
 
 def index(request):
     if not request.user.is_authenticated:
@@ -170,8 +170,11 @@ def delete_lanedata(request, pk=None):
 @user_passes_test(lambda u: u.is_staff)
 def run_messages(request, pk):
     run = Run.objects.get(pk=pk)
-    pools = request.POST.getlist('pools') # get pool ids to send messages for
-    context = {"run": run, "lanes": RunLane.objects.filter(run=run)}
+    if request.method == 'POST':
+        form = RunMessageForm(request.POST, run=run)
+    else:
+        form = RunMessageForm(run=run)
+    context = {"run": run, "lanes": RunLane.objects.filter(run=run), "form": form, "data": request.POST}
     return render(request, "run_messages.html", context)
 
 # @user_passes_test(lambda u: u.is_staff)

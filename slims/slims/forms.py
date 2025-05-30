@@ -182,3 +182,12 @@ class LaneDataForm(forms.ModelForm):
         fields = ["data_path", "repository_subpath"]
 
 # LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)
+
+class RunMessageForm(forms.Form):
+    message = forms.CharField(widget=forms.Textarea)
+    pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all())
+    # forms.MultipleChoiceField(widget=forms.HiddenInput)
+    def __init__(self, *args, **kwargs):
+        self.run = kwargs.pop('run')
+        super().__init__(*args, **kwargs)
+        self.fields['pools'].queryset = self.run.lanes.all()
