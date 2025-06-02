@@ -1,5 +1,6 @@
 from django import forms
 from coreomics.models import Submission
+from coreomics.utils import format_note
 from slims.models import Run, RunLane, LaneData
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Div
@@ -184,10 +185,30 @@ class LaneDataForm(forms.ModelForm):
 # LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)
 
 class RunMessageForm(forms.Form):
-    message = forms.CharField(widget=forms.Textarea)
-    pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all())
+    message = forms.CharField(widget=forms.Textarea,help_text='Use "{data_urls}" to expand into the list of URLS for the run data for each submission.')
+    pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all(), widget=forms.CheckboxSelectMultiple)
+    test = forms.BooleanField(help_text="Select this to see what messages will be sent to which submissions.", required=False)
     # forms.MultipleChoiceField(widget=forms.HiddenInput)
     def __init__(self, *args, **kwargs):
         self.run = kwargs.pop('run')
         super().__init__(*args, **kwargs)
         self.fields['pools'].queryset = self.run.lanes.all()
+    def get_pools(self):
+        pools_qs = self.fields['pools'].queryset
+        return list(zip(self['pools'], pools_qs))
+    def send_message(self):
+        message = self.cleaned_data['message']
+        pools = self.cleaned_data['pools']
+        test = self.cleaned_data['test']
+        submissions = Submission.objects.filter(lanes__in=pools).distinct()
+        notes = []
+        for submission in submissions:
+            formatted_note = format_note(message, submission, LaneData.objects.filter(lane__run=self.run, lane__submission=submission, status=LaneData.STATUS_COMPLETE))
+            try:
+                if not test:
+                    # pass
+                    response = submission.create_note(formatted_note)
+                notes.append((submission.submission_id, formatted_note, True))
+            except:
+                notes.append(submission.submission_id, formatted_note, False)
+        return notes

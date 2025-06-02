@@ -172,9 +172,12 @@ def run_messages(request, pk):
     run = Run.objects.get(pk=pk)
     if request.method == 'POST':
         form = RunMessageForm(request.POST, run=run)
+        if form.is_valid():
+            context = {"run": run, "form": form, "messages": form.send_message()}
+            return render(request, "run_messages.html", context)
     else:
         form = RunMessageForm(run=run)
-    context = {"run": run, "lanes": RunLane.objects.filter(run=run), "form": form, "data": request.POST}
+    context = {"run": run, "form": form, "data": request.POST}
     return render(request, "run_messages.html", context)
 
 # @user_passes_test(lambda u: u.is_staff)

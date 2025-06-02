@@ -5,6 +5,15 @@
 <div class="card mt-2">
     <div class="card-body">
         {{data}}
+        {% if messages %}
+        {% for submission, message, success in messages %}
+        <div class="alert {% if form.cleaned_data.test %}alert-info{% elif success %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+            <h4>{% if form.cleaned_data.test %}(TEST) {% endif %}Submission: {{submission}}</h4>
+            <pre>{{message}}</pre>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {{messages}}
         <form method="POST">
             {% for field in form %}
                 {% if field.name != 'pools' %}
@@ -13,13 +22,13 @@
             {% endfor %}
             <table class="table table-striped">
                 <thead>
-                    <tr><th>Select</th><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
+                    <tr><th><label><input type="checkbox" id="selectAll"/> Select</label></th><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
                 </thead>
                 <tbody>
-                    {% for l in lanes %}
+                    {% for checkbox, l in form.get_pools %}
                         {% if l.submission %}
                         <tr submission="{{l.submission.id}}">
-                            <td><input type="checkbox" name="pools" value="{{l.pk}}"></td>
+                            <td class="pool-select">{{checkbox.tag}}</td>
                             <td>{{l.lane_number}}</td>
                             <td>{{l.pi_name}}</td>
                             {% if user.is_staff %}
@@ -38,11 +47,17 @@
                         {% endif %}
                     {% endfor %}
                 </tbody>
-    
             </table>
             {% csrf_token %}
-            <button class="btn btn-primary">submit</button>
+            <button class="btn btn-primary">Submit</button>
         </form>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#selectAll').change(function(data, event){
+            $('.pool-select input').prop('checked', this.checked);
+        })
+    });
+</script>
 {% endblock %}
