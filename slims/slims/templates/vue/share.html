@@ -65,15 +65,15 @@
       computed: {
         users () {
             let users = this.share.submission.participants.map(u => {
-                return { name: `${u.last_name}, ${u.first_name}`, email: u.email, source: 'Participants'}
+                return { name: `${u.last_name}, ${u.first_name}`, email: u.email.toLowerCase(), source: 'Participants'}
             })
-            users.push({name: this.share.submission.pi_name, email: this.share.submission.pi_email, source: 'PI'});
-            users.push({name: this.share.submission.submitter_name, email: this.share.submission.submitter_email, source: 'Submitter'});
+            users.push({name: this.share.submission.pi_name, email: this.share.submission.pi_email.toLowerCase(), source: 'PI'});
+            users.push({name: this.share.submission.submitter_name, email: this.share.submission.submitter_email.toLowerCase(), source: 'Submitter'});
             this.share.submission.contacts.forEach(c => {
-                users.push({name: `${c.last_name}, ${c.first_name}`, email: c.email, source: 'Contacts'})
+                users.push({name: `${c.last_name}, ${c.first_name}`, email: c.email.toLowerCase(), source: 'Contacts'})
             });
             users.forEach(u => {
-                u.permissions = this.share.permissions.user_perms[u.email]
+                u.permissions = this.share.permissions.user_perms[u.email.toLowerCase()]
             })
             return users
         }
