@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+# from slims.models import RunLane, LaneData
+
 class Submission(models.Model):
     id = models.CharField(max_length=50, primary_key=True, editable=False)
     internal_id = models.CharField(max_length=25, null=True)
@@ -60,4 +62,12 @@ class Submission(models.Model):
         from .utils import create_note
         return create_note(self, note)
 
-        
+class Note(models.Model):
+    coreomics_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
+    template = models.TextField(null=True)
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    sent = models.DateTimeField(null=True)
+    data = models.JSONField(null=True)
+    pools = models.ManyToManyField('slims.RunLane', symmetrical=True, related_name="notes")

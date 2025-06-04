@@ -220,6 +220,10 @@ class Run(models.Model):
     def can_modify(self):
         days_old = (timezone.now() - self.submitted).days
         return days_old < 90
+    @property
+    def messages(self):
+        from coreomics.models import Note
+        return Note.objects.filter(pools__run=self).order_by('created')
     @cached_property
     def run_class(self):
         from .run_type import RunType, RunTypeRegistry

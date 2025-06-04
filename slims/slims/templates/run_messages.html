@@ -4,60 +4,101 @@
 <h3 class="card-title"><a href="{% url 'runs' %}">Runs</a> / <a href="{% url 'run' pk=run.pk %}">{{run}}</a> / Messages</h3>
 <div class="card mt-2">
     <div class="card-body">
-        {{data}}
-        {% if messages %}
-        {% for submission, message, success in messages %}
-        <div class="alert {% if form.cleaned_data.test %}alert-info{% elif success %}alert-success{% else %}alert-danger{% endif %}" role="alert">
-            <h4>{% if form.cleaned_data.test %}(TEST) {% endif %}Submission: {{submission}}</h4>
-            <pre>{{message}}</pre>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {{messages}}
-        <form method="POST">
-            {% for field in form %}
-                {% if field.name != 'pools' %}
-                    {{ field|as_crispy_field }}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab" aria-controls="form" aria-selected="true">Create Messages</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="false">Messages ({{run.messages|length}})</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="new" role="tabpanel" aria-labelledby="form-tab">
+                {% if messages %}
+                <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">New Messages{% if form.cleaned_data.test %}(Testing, not yet created) {% endif %}</h5>
+                        {% for submission, message in messages %}
+                        <div class="alert {% if form.cleaned_data.test %}alert-info{% elif message.coreomics_id %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                            <h4>Submission: {{message.submission}}</h4>
+                            <pre>{{message.text}}</pre>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
-            {% endfor %}
-            <table class="table table-striped">
-                <thead>
-                    <tr><th><label><input type="checkbox" id="selectAll"/> Select</label></th><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
-                </thead>
-                <tbody>
-                    {% for checkbox, l in form.get_pools %}
-                        {% if l.submission %}
-                        <tr submission="{{l.submission.id}}">
-                            <td class="pool-select">{{checkbox.tag}}</td>
-                            <td>{{l.lane_number}}</td>
-                            <td>{{l.pi_name}}</td>
-                            {% if user.is_staff %}
-                            <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
-                            {% endif %}
-                            <td>{{l.project_id}}</td>
-                            <td>{{l.lane_dir}}</td>
-                            <td>{{l.description}}</td>
-                            <td>
-                                {% for status, directories in l.grouped_directories.items %}
-                                    <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
-                                {% endfor %}
-                            </td>
-                            <td>{% if l.data_url %}<a href="{{l.data_url}}" class="btn btn-primary">Data</a>{% endif %}</td>
-                        </tr>
+                <form method="POST">
+                    {% for field in form %}
+                        {% if field.name != 'pools' %}
+                            {{ field|as_crispy_field }}
                         {% endif %}
                     {% endfor %}
-                </tbody>
-            </table>
-            {% csrf_token %}
-            <button class="btn btn-primary">Submit</button>
-        </form>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr><th><label><input type="checkbox" id="selectAll"/> Select</label></th><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Messages</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for checkbox, l in form.get_pools %}
+                                {% if l.submission %}
+                                <tr submission="{{l.submission.id}}" class="{% if l.notes.count %}has-message{% else %}no-message{% endif %}">
+                                    <td class="pool-select">{{checkbox.tag}}</td>
+                                    <td>{{l.lane_number}}</td>
+                                    <td>{{l.pi_name}}</td>
+                                    {% if user.is_staff %}
+                                    <td>{% if l.submission %}<a href="{% url 'submission' pk=l.submission.pk %}">{{l.submission}}</a>{% endif %}</td>
+                                    {% endif %}
+                                    <td>{{l.project_id}}</td>
+                                    <td>{{l.lane_dir}}</td>
+                                    <td>{{l.description}}</td>
+                                    <td>
+                                        {% for status, directories in l.grouped_directories.items %}
+                                            <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{l.notes.count}} Message(s)</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% csrf_token %}
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                {% for message in run.messages %}
+                <div class="alert {% if message.coreomics_id %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                    <h4>Submission: {{message.submission}}</h4>
+                    <pre>{{message.text}}</pre>
+                </div>
+                {% endfor %}
+            </div>
+          </div>
     </div>
 </div>
 <script>
+    function toggleDisable () {
+        var disabled = !$('input[name=allow_repeat_messages]').prop('checked');
+        if (disabled) {
+            $('.has-message .pool-select input').prop('checked', false).attr("disabled", true);
+        } else {
+            $('.has-message .pool-select input').attr("disabled", false);
+        }
+    }
     $(document).ready(function() {
         $('#selectAll').change(function(data, event){
-            $('.pool-select input').prop('checked', this.checked);
+            if (this.checked) {
+                $('.pool-select input:not(:disabled)').prop('checked', this.checked);
+            } else {
+                $('.pool-select input').prop('checked', this.checked);
+            }
         })
+        // $('.has-message .pool-select input').prop('checked', false).attr("disabled", true);
+        $('input[name=allow_repeat_messages]').change(toggleDisable)
+        toggleDisable();
+        // $('.has-message .pool-select input').change(function() {
+        //     $(this).prop('checked', false);
+        // })
     });
 </script>
 {% endblock %}

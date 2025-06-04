@@ -1,5 +1,5 @@
 from django import forms
-from coreomics.models import Submission
+from coreomics.models import Submission, Note
 from coreomics.utils import format_note
 from slims.models import Run, RunLane, LaneData
 from crispy_forms.helper import FormHelper
@@ -188,6 +188,7 @@ class RunMessageForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea,help_text='Use "{data_urls}" to expand into the list of URLS for the run data for each submission.')
     pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all(), widget=forms.CheckboxSelectMultiple)
     test = forms.BooleanField(help_text="Select this to see what messages will be sent to which submissions.", required=False)
+    allow_repeat_messages = forms.BooleanField(help_text="Select this to allow repeat messages for a pool.  By default, only one message needs to be sent per pool.", required=False)
     # forms.MultipleChoiceField(widget=forms.HiddenInput)
     def __init__(self, *args, **kwargs):
         self.run = kwargs.pop('run')
@@ -204,11 +205,10 @@ class RunMessageForm(forms.Form):
         notes = []
         for submission in submissions:
             formatted_note = format_note(message, submission, LaneData.objects.filter(lane__run=self.run, lane__submission=submission, status=LaneData.STATUS_COMPLETE))
-            try:
-                if not test:
-                    # pass
-                    response = submission.create_note(formatted_note)
-                notes.append((submission.submission_id, formatted_note, True))
-            except:
-                notes.append(submission.submission_id, formatted_note, False)
+            note = Note(submission=submission, template=message, text=formatted_note)
+            if not test:
+                note.save()
+                note.pools.add(*pools.filter(submission=submission))
+                # response = submission.create_note(formatted_note)
+            notes.append((submission.submission_id, note))
         return notes
