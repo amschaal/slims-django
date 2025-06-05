@@ -58,9 +58,9 @@ class Submission(models.Model):
         from .utils import link_share
         if hasattr(self, 'share'):
             link_share(self, self.share)
-    def create_note(self, note):
-        from .utils import create_note
-        return create_note(self, note)
+    # def create_note(self, note):
+    #     from .utils import create_note
+    #     return create_note(self, note)
 
 class Note(models.Model):
     coreomics_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
@@ -71,3 +71,12 @@ class Note(models.Model):
     sent = models.DateTimeField(null=True)
     data = models.JSONField(null=True)
     pools = models.ManyToManyField('slims.RunLane', symmetrical=True, related_name="notes")
+    def create(self, asynchronous=False):
+        # print('****Creating Note****')
+        from .utils import create_note
+        from threading import Thread
+        if asynchronous:
+            # print ("create note asynchronously!!!!!!!!!!")
+            Thread(target=create_note, args=(self.id,)).start()
+        else:
+            create_note(self)

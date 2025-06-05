@@ -37,7 +37,7 @@
     <div class="card-body">
         <h3 class="card-title">Pools</h3>
         {% if user.is_staff %}
-        <a class="btn btn-primary" href="{% url 'run_data' pk=run.pk %}">Manage Data</a>
+        <a class="btn btn-primary" href="{% url 'run_data' pk=run.pk %}">Manage Data</a> <a class="btn btn-primary" href="{% url 'run_messages' pk=run.pk %}">Messages</a>
         {% endif %}
         <table class="table table-striped">
             <thead>

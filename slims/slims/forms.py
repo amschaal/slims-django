@@ -209,6 +209,7 @@ class RunMessageForm(forms.Form):
             if not test:
                 note.save()
                 note.pools.add(*pools.filter(submission=submission))
+                note.create()
                 # response = submission.create_note(formatted_note)
             notes.append((submission.submission_id, note))
         return notes

@@ -2,6 +2,7 @@ import urllib.request, json
 from django.conf import settings
 from .models import Submission
 from datetime import date, timedelta
+from django.utils import timezone
 
 def import_submissions(days=30):
     exclude_types = getattr(settings, 'EXCLUDE_SUBMISSION_TYPES', [])
@@ -47,15 +48,39 @@ def link_share(submission, share):
         raise Exception(error_message)
     return response
 
-def create_note(submission, text):
+# def create_note(submission, text):
+#     url = '{base_url}/server/api/notes/'.format(base_url=settings.COREOMICS_BASE_URL)
+#     data = {"type":"NOTE","submission":submission.id,"send_email":True,"email_participants":False,"public":True,"edit":True,"parent":None,"text":text}
+#     params = json.dumps(data).encode('utf8')
+#     req = urllib.request.Request(url, data=params)
+#     req.add_header('Content-Type', 'application/json')
+#     req.add_header('Authorization', 'Token {token}'.format(token=settings.COREOMICS_TOKEN))
+#     response = urllib.request.urlopen(req)
+#     data = json.loads(response.read())
+#     return data
+
+def create_note(note_or_id):
+    from .models import Note
+    if isinstance(note_or_id, Note):
+        note = note_or_id
+    elif isinstance(note_or_id, int):
+        try:
+            note = Note.objects.get(id=note_or_id)
+        except Note.DoesNotExist:
+            print("Instance with given ID does not exist.")
+            return
+    print('Creating note: ' + note.text)
     url = '{base_url}/server/api/notes/'.format(base_url=settings.COREOMICS_BASE_URL)
-    data = {"type":"NOTE","submission":submission.id,"send_email":True,"email_participants":False,"public":True,"edit":True,"parent":None,"text":text}
+    data = {"type":"NOTE","submission":note.submission.id,"send_email":True,"email_participants":False,"public":True,"edit":True,"parent":None,"text":note.text}
     params = json.dumps(data).encode('utf8')
     req = urllib.request.Request(url, data=params)
     req.add_header('Content-Type', 'application/json')
     req.add_header('Authorization', 'Token {token}'.format(token=settings.COREOMICS_TOKEN))
     response = urllib.request.urlopen(req)
-    data = json.loads(response.read())
+    note.data = json.loads(response.read())
+    note.coreomics_id = note.data['id']
+    note.sent = timezone.now()
+    note.save()
     return data
 
 def format_note(note, submission, data_directories=[]):

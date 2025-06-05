@@ -19,10 +19,7 @@
                     <div class="card-body">
                       <h5 class="card-title">New Messages{% if form.cleaned_data.test %}(Testing, not yet created) {% endif %}</h5>
                         {% for submission, message in messages %}
-                        <div class="alert {% if form.cleaned_data.test %}alert-info{% elif message.coreomics_id %}alert-success{% else %}alert-warning{% endif %}" role="alert">
-                            <h4>Submission: {{message.submission}}</h4>
-                            <pre>{{message.text}}</pre>
-                        </div>
+                        {% include 'partials/message.html' with test=form.cleaned_data.test message=message %}
                         {% endfor %}
                     </div>
                 </div>
@@ -67,10 +64,7 @@
             </div>
             <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
                 {% for message in run.messages %}
-                <div class="alert {% if message.coreomics_id %}alert-success{% else %}alert-warning{% endif %}" role="alert">
-                    <h4>Submission: {{message.submission}}</h4>
-                    <pre>{{message.text}}</pre>
-                </div>
+                    {% include 'partials/message.html' with test=form.cleaned_data.test message=message %}
                 {% endfor %}
             </div>
           </div>
