@@ -27,6 +27,7 @@
             <th>Submissions</th>
             <th>Description</th>
             <th>Data Status</th>
+            <th>Messages</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -84,6 +85,23 @@
                             }
                         }
                         return statuses.join(', ')
+                    }
+                },
+                {
+                    data: 'metadata',
+                    sortable: false,
+                    render: function (data, type, row) {
+                        var html = '';
+                        if (!data || !data.messages) {
+                            return ''
+                        }
+                        if (data.messages.pools_without_messages || data.messages.submissions_without_messages) {
+                            html += `<i class="fa-solid fa-xmark" style="color: red;" title="${data.messages.pools_without_messages} pools without messages, ${data.messages.submissions_without_messages} submissions without messages"></i>`;
+                        }
+                        if (data.messages.unsent_messages) {
+                            html += `<i class="fa-solid fa-warning" style="color: red;" title="${data.messages.unsent_messages} unsent messages"></i>`;
+                        }
+                        return html;
                     }
                 },
                 {

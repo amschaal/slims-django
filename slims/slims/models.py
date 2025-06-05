@@ -240,6 +240,20 @@ class Run(models.Model):
         self.metadata['data_status'] = statuses
         if save:
             self.save()
+    def update_message_status(self, save=True):
+        from coreomics.models import Note
+        pools_without_messages = RunLane.objects.filter(notes__isnull=True).filter(submission__isnull=False, run=self).distinct()
+        submissions_without_messages = Submission.objects.filter(lanes__in=pools_without_messages).distinct()
+        messages = Note.objects.filter(pools__run=self).distinct()
+        unsent_messages = messages.filter(coreomics_id__isnull=True)
+        self.metadata['messages'] = {
+            'submissions_without_messages': submissions_without_messages.count(),
+            'pools_without_messages': pools_without_messages.count(),
+            'unsent_messages': unsent_messages.count(),
+            'messages': messages.count()
+        }
+        if save:
+            self.save()
     def __str__(self):
         return '{}: {}'.format((str(self.run_date) if self.run_date else str(self.submitted)), (self.unique_id or self.machine or ''))
     class Meta:

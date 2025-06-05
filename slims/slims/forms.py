@@ -189,11 +189,13 @@ class RunMessageForm(forms.Form):
     pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all(), widget=forms.CheckboxSelectMultiple)
     test = forms.BooleanField(help_text="Select this to see what messages will be sent to which submissions.", required=False)
     allow_repeat_messages = forms.BooleanField(help_text="Select this to allow repeat messages for a pool.  By default, only one message needs to be sent per pool.", required=False)
+    # select_submission = forms.ModelChoiceField(queryset=Submission.objects.none(),help_text="Select a submission to select all pools related to that submission.", required=False)
     # forms.MultipleChoiceField(widget=forms.HiddenInput)
     def __init__(self, *args, **kwargs):
         self.run = kwargs.pop('run')
         super().__init__(*args, **kwargs)
         self.fields['pools'].queryset = self.run.lanes.all()
+        # self.fields['select_submission'].queryset = Submission.objects.filter(lanes__run=self.run).distinct()
     def get_pools(self):
         pools_qs = self.fields['pools'].queryset
         return list(zip(self['pools'], pools_qs))
@@ -212,4 +214,5 @@ class RunMessageForm(forms.Form):
                 note.create()
                 # response = submission.create_note(formatted_note)
             notes.append((submission.submission_id, note))
+        self.run.update_message_status()
         return notes
