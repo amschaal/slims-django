@@ -59,7 +59,7 @@ def link_share(submission, share):
 #     data = json.loads(response.read())
 #     return data
 
-def create_note(note_or_id):
+def send_note(note_or_id):
     from .models import Note
     if isinstance(note_or_id, Note):
         note = note_or_id

@@ -211,8 +211,14 @@ class RunMessageForm(forms.Form):
             if not test:
                 note.save()
                 note.pools.add(*pools.filter(submission=submission))
-                note.create()
+                # note.send_note()
                 # response = submission.create_note(formatted_note)
             notes.append((submission.submission_id, note))
+        if not test:
+            for submission_id, note in notes:
+                try:
+                    note.send_note()
+                except Exception as e:
+                    print(e)
         self.run.update_message_status()
         return notes

@@ -71,12 +71,14 @@ class Note(models.Model):
     sent = models.DateTimeField(null=True)
     data = models.JSONField(null=True)
     pools = models.ManyToManyField('slims.RunLane', symmetrical=True, related_name="notes")
-    def create(self, asynchronous=False):
+    def __str__(self):
+        return '{submission}: {created}'.format(submission=self.submission.submission_id, created=self.created)
+    def send_note(self, asynchronous=False):
         # print('****Creating Note****')
-        from .utils import create_note
+        from .utils import send_note
         from threading import Thread
         if asynchronous:
             # print ("create note asynchronously!!!!!!!!!!")
-            Thread(target=create_note, args=(self.id,)).start()
+            Thread(target=send_note, args=(self.id,)).start()
         else:
-            create_note(self)
+            send_note(self)
