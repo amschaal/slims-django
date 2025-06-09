@@ -161,4 +161,8 @@ BIOSHARE_EMAIL_CLIENT = True
 
 EXCLUDE_SUBMISSION_TYPES = [] # Use submission type.id or type.prefix
 
+MESSAGE_TEMPLATE = """You have data available at the following URL:
+{share_url}
+"""
+
 from .config import *

@@ -84,6 +84,7 @@ def send_note(note_or_id):
     return data
 
 def format_note(note, submission, data_directories=[]):
-    share_url = (submission.share.url if hasattr(submission, 'share') else '') + '{repository_subpath}'
-    data_urls = '\n'.join([share_url.format(repository_subpath=d.repository_subpath) for d in data_directories])
-    return note.format(data_urls=data_urls)
+    share_url = submission.share.url if hasattr(submission, 'share') else ''
+    data_url_template = share_url + '{repository_subpath}'
+    data_urls = '\n'.join([data_url_template.format(repository_subpath=d.repository_subpath) for d in data_directories])
+    return note.format(data_urls=data_urls, share_url=share_url)

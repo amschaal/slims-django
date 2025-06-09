@@ -223,7 +223,7 @@ class Run(models.Model):
     @property
     def messages(self):
         from coreomics.models import Note
-        return Note.objects.filter(pools__run=self).order_by('created')
+        return Note.objects.filter(pools__run=self).distinct().order_by('created')
     @cached_property
     def run_class(self):
         from .run_type import RunType, RunTypeRegistry

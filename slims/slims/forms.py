@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from coreomics.models import Submission, Note
 from coreomics.utils import format_note
 from slims.models import Run, RunLane, LaneData
@@ -185,7 +186,11 @@ class LaneDataForm(forms.ModelForm):
 # LaneDataFormSet = forms.modelformset_factory(LaneData, fields=["data_path", "repository_subpath"], extra=1, can_delete=True)
 
 class RunMessageForm(forms.Form):
-    message = forms.CharField(widget=forms.Textarea,help_text='Use "{data_urls}" to expand into the list of URLS for the run data for each submission.')
+    message = forms.CharField(
+        widget=forms.Textarea,
+        help_text='The message template to be sent to every submission associated with the selected pools.  Use "{share_url}" to expand to the URL for the submission\'s share, or "{data_urls}" if you want a URL for every data directory for the selected pools.',
+        initial=settings.MESSAGE_TEMPLATE
+        )
     pools = forms.ModelMultipleChoiceField(queryset=LaneData.objects.all(), widget=forms.CheckboxSelectMultiple)
     test = forms.BooleanField(help_text="Select this to see what messages will be sent to which submissions.", required=False)
     allow_repeat_messages = forms.BooleanField(help_text="Select this to allow repeat messages for a pool.  By default, only one message needs to be sent per pool.", required=False)

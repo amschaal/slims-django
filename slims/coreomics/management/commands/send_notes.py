@@ -17,7 +17,7 @@ class Command(BaseCommand):
         # print (runs)
         for note in notes:
             try:
-                # note.send_note()
+                note.send_note()
                 print('Note {note} sent'.format(note=note))
             except:
                 print('Note {note} send failed!!'.format(note=note))

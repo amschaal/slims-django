@@ -60,6 +60,7 @@ def edit_run(request, pk=None, run_type=None):
             lane_formset.is_valid()
             lane_formset.save()
             run.update_data_status()
+            run.update_message_status()
             return redirect('run', pk=run.pk)
 
     return render(request, run.run_class.run_form_template, { "run_form": run_form, "lane_formset": lane_formset, "run": run, "helper": helper})
