@@ -36,12 +36,15 @@ class RunForm(forms.ModelForm):
 
     class Meta:
         model = Run
-        fields = ["unique_id", "type", "run_date", "machine", "run_dir", "description", "notes"]
+        fields = ["unique_id", "type", "run_date", "machine", "run_dir", "description", "notes", "completed"]
         widgets = {
             'run_date': forms.DateInput(attrs={'type': 'date'})
         }
         labels = {
             'unique_id': 'Run ID'
+        }
+        help_texts = {
+            'completed': 'If the run is complete, the data is available, and the customer has been contacted.  This prevent warning messages from being displayed for the run.'
         }
 
 class PacbioRunForm(RunForm):

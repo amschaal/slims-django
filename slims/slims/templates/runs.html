@@ -47,7 +47,8 @@
                 { 
                     data: "run_date", 
                     render: function (data, type, row) {
-                        return moment(data).format('M/D/YYYY');
+                        var date = moment(data).format('M/D/YYYY');
+                        return row.completed ? '<span class="text-success" title="Completed">'+date+'</span>' : date
                     }
                 },
                 { 
@@ -95,11 +96,14 @@
                         if (!data || !data.messages) {
                             return ''
                         }
-                        if (data.messages.pools_without_messages || data.messages.submissions_without_messages) {
+                        if (!row.completed && (data.messages.pools_without_messages || data.messages.submissions_without_messages)) {
                             html += `<i class="fa-solid fa-xmark" style="color: red;" title="${data.messages.pools_without_messages} pools without messages, ${data.messages.submissions_without_messages} submissions without messages"></i>`;
                         }
                         if (data.messages.unsent_messages) {
                             html += `<i class="fa-solid fa-warning" style="color: red;" title="${data.messages.unsent_messages} unsent messages"></i>`;
+                        }
+                        if (data.messages.messages) {
+                            html += `<i class="fa-solid fa-envelope" style="color: green;" title="${data.messages.messages} messages sent"></i>`;
                         }
                         return html;
                     }

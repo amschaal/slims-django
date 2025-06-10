@@ -52,7 +52,14 @@
                                             <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
                                         {% endfor %}
                                     </td>
-                                    <td>{{l.notes.count}} Message(s)</td>
+                                    <td>
+                                        {% if l.sent_messages.count %}
+                                            <i class="fa-solid fa-envelope" style="color: green;" title="{{l.sent_messages.count}} messages sent"></i>
+                                        {% endif %}
+                                        {% if l.unsent_messages.count %}
+                                            <i class="fa-solid fa-warning" style="color: red;" title="{{l.unsent_messages.count}} unsent messages"></i>`;
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endif %}
                             {% endfor %}

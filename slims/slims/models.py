@@ -206,6 +206,7 @@ class Run(models.Model):
     last_transfer = models.DateTimeField(blank=True, null=True)
     run_type = models.CharField(max_length=15, blank=True, null=True)
     metadata = models.JSONField(default=dict)
+    completed = models.BooleanField(default=False)
     def ordered_lanes(self, user=None):
         lanes = self.lanes.all().order_by('lane_number')
         if user and not user.is_staff:
@@ -328,6 +329,10 @@ class RunLane(models.Model):
     #     return LaneData.objects.bulk_create(instances)
     def create_lane_directories(self):
         self.run.run_class.create_lane_directories(self)
+    def unsent_messages(self):
+        return self.notes.filter(coreomics_id__isnull=True)
+    def sent_messages(self):
+        return self.notes.filter(coreomics_id__isnull=False)
     def save(self, **kwargs):
         status = super().save(**kwargs)
         self.create_lane_directories()

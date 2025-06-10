@@ -29,7 +29,10 @@
             <tr><th>Run Date</th><td>{{run.run_date}}</td></tr>
             <tr><th>Created</th><td>{{run.submitted}}</td></tr>
             <tr><th>Description</th><td>{{run.description}}</td></tr>
-            {% if user.is_staff %}<tr><th>Notes</th><td>{{run.notes}}</td></tr>{% endif %}
+            {% if user.is_staff %}
+            <tr><th>Notes</th><td>{{run.notes}}</td></tr>
+            <tr><th>Completed</th><td class="{% if run.completed %}text-success{% else %}text-danger{% endif %}">{{run.completed}}</td></tr>
+            {% endif %}
         </table>
     </div>
 </div>
@@ -41,7 +44,7 @@
         {% endif %}
         <table class="table table-striped">
             <thead>
-                <tr><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th>{% endif %}<th>Controls</th></tr>
+                <tr><th>Unit</th><th>PI/Group</th>{% if user.is_staff %}<th>Submission</th>{% endif %}<th>Project ID</th><th>Pool Dir</th><th>Description</th>{% if user.is_staff%}<th><a href="{% url 'run_data' pk=run.pk %}">Data Directories</a></th><th><a href="{% url 'run_messages' pk=run.pk %}">Messages</a></th>{% endif %}<th>Controls</th></tr>
             </thead>
             <tbody>
                 {% for l in lanes %}
@@ -61,6 +64,16 @@
                                 {% for status, directories in l.grouped_directories.items %}
                                     <span class="status-{{status}}">{{directories|length}} {{status}}</span>{% if not forloop.last %}, {% endif %}</div>
                                 {% endfor %}
+                            </td>
+                            <td>
+                                {% if l.sent_messages.count %}
+                                    <i class="fa-solid fa-envelope" style="color: green;" title="{{l.sent_messages.count}} messages sent"></i>
+                                {% elif not l.notes.count %}
+                                    <i class="fa-solid fa-xmark" style="color: red;" title="No messages"></i>
+                                {% endif %}
+                                {% if l.unsent_messages.count %}
+                                   <i class="fa-solid fa-warning" style="color: red;" title="{{l.unsent_messages.count}} unsent messages"></i>`;
+                                {% endif %}
                             </td>
                         {% endif %}
                         <td>{% if l.data_url %}<a href="{{l.data_url}}" class="btn btn-primary">Data</a>{% endif %}</td>
