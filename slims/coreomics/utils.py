@@ -71,7 +71,7 @@ def send_note(note_or_id):
             return
     print('Creating note: ' + note.text)
     url = '{base_url}/server/api/notes/'.format(base_url=settings.COREOMICS_BASE_URL)
-    data = {"type":"NOTE","submission":note.submission.id,"send_email":True,"email_participants":False,"public":True,"edit":True,"parent":None,"text":note.text}
+    data = {"type":"NOTE","submission":note.submission.id,"send_email":True,"email_participants":settings.COREOMICS_EMAIL_PARTICIPANTS,"public":True,"edit":True,"parent":None,"text":note.text}
     params = json.dumps(data).encode('utf8')
     req = urllib.request.Request(url, data=params)
     req.add_header('Content-Type', 'application/json')
@@ -81,7 +81,7 @@ def send_note(note_or_id):
     note.coreomics_id = note.data['id']
     note.sent = timezone.now()
     note.save()
-    return data
+    return note.data
 
 def format_note(note, submission, data_directories=[]):
     share_url = submission.share.url if hasattr(submission, 'share') else ''

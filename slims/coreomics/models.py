@@ -82,3 +82,7 @@ class Note(models.Model):
             Thread(target=send_note, args=(self.id,)).start()
         else:
             send_note(self)
+    @property
+    def sent_to(self):
+        if self.coreomics_id and self.data:
+            return list(set(self.data['emails']))

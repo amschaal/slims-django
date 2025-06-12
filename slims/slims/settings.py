@@ -165,4 +165,6 @@ MESSAGE_TEMPLATE = """You have data available at the following URL:
 {share_url}
 """
 
+COREOMICS_EMAIL_PARTICIPANTS = True
+
 from .config import *

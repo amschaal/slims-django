@@ -1,5 +1,5 @@
 <div class="alert {% if test %}alert-info{% elif message.coreomics_id %}alert-success{% else %}alert-warning{% endif %}" role="alert">
     <h4>Submission: <a href="{{message.submission.url}}">{{message.submission}}</a></h4>
-    <h6>{% if message.sent %}Sent at: {{message.sent}}{% else %}Message not sent{% endif %}</h6>
+    <h6>{% if message.sent %}Sent at: {{message.sent}} To: {% for email in message.sent_to %}{{email}}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}Message not sent{% endif %}</h6>
     <pre>{{message.text}}</pre>
 </div>
