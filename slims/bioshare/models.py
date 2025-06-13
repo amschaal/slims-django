@@ -69,10 +69,13 @@ class SubmissionShare(models.Model):
         if DEFAULT_GROUP:
             perms["groups"] = {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}
         return self.set_permissions(perms)
-    def share(self, contacts=True, email=False):
+    def get_client_emails(self, contacts=True):
         emails = [self.submission.submitter_email, self.submission.pi_email]
         if contacts:
             emails += [c['email'] for c in self.contacts]
+        return [e.lower() for e in emails]
+    def share(self, contacts=True, email=False):
+        emails = self.get_client_emails(contacts=contacts)
         perms = {"groups": {}, "users":dict([(email,self.VIEWER_PERMISSIONS) for email in emails]), "email":email}
         return self.set_permissions(perms)
     def update_permissions(self):
@@ -92,3 +95,9 @@ class SubmissionShare(models.Model):
         return link_data(self.bioshare_id, target, share_path)
     def get_permissions(self):
         return bioshare_get(GET_PERMISSIONS_URL.format(id=self.bioshare_id))
+    def is_shared_with_clients(self):
+        permissions = self.permissions.get('user_perms',{})
+        for e in self.get_client_emails():
+            if e not in permissions:
+                return False
+        return True

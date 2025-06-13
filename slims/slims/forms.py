@@ -207,6 +207,24 @@ class RunMessageForm(forms.Form):
     def get_pools(self):
         pools_qs = self.fields['pools'].queryset
         return list(zip(self['pools'], pools_qs))
+    def clean_pools(self):
+        pools = self.cleaned_data.get('pools')
+        submissions = Submission.objects.filter(lanes__in=pools).distinct()
+        missing_share = []
+        not_shared = []
+        for s in submissions:
+            if not hasattr(s, 'share'):
+                missing_share.append(s.submission_id)
+            elif not s.share.is_shared_with_clients():
+                not_shared.append(s.submission_id)
+        errors = []
+        if missing_share:
+            errors.append('Share has not yet been created for submission(s): {}'.format(', '.join(missing_share)))
+        if not_shared:
+            errors.append('One or more clients are missing share permissions for submission(s): {}'.format(', '.join(not_shared)))
+        if errors:
+            raise forms.ValidationError(errors)
+        return pools
     def send_message(self):
         message = self.cleaned_data['message']
         pools = self.cleaned_data['pools']
