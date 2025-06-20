@@ -92,7 +92,8 @@ def group(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def submissions(request):
     if request.method == 'POST' and 'update' in request.POST:
-        import_submissions(days=7)
+        days = max(min(int(request.POST.get('update', 7)), 31),7) # Make sure value is between 7 and 31
+        import_submissions(days=days)
     return render(request, "submissions.html")
 
 @user_passes_test(lambda u: u.is_staff)
