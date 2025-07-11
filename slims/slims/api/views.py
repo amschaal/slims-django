@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Count
 from coreomics.models import Submission
 from bioshare.models import SubmissionShare
-from coreomics.utils import format_note
+from coreomics.utils import format_note, import_submission
 from slims.models import Run, RunLane, LaneData
 from .serializers import BioshareSerializer, UserDetailSerializer, GroupDetailSerializer, RunSerializer, RunLaneSerializer, SubmissionSerializer, RunLaneDetailSerializer, LaneDataSerializer
 from rest_framework import routers, viewsets
@@ -123,6 +123,12 @@ class SubmissionViewSet(viewsets.ReadOnlyModelViewSet):
         submission = self.get_object()
         submission.link_share()
         return Response(SubmissionSerializer(submission).data)
+    @action(detail=False, methods=['post'])
+    def import_submission(self, request):
+        id = request.data.get('id')
+        submission = import_submission(id)
+        return Response(SubmissionSerializer(submission).data)
+    
 
 class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SubmissionShare.objects.all()
