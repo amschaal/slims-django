@@ -13,6 +13,7 @@
           <li><a class="dropdown-item" href="#" onclick="updateSubmissions(7)">1 week</a></li>
           <li><a class="dropdown-item" href="#" onclick="updateSubmissions(14)">2 weeks</a></li>
           <li><a class="dropdown-item" href="#" onclick="updateSubmissions(31)">1 month</a></li>
+          <li><a class="dropdown-item" href="#" onclick="openSubmissionModal()">Import by ID</a></li>
         </ul>
       </div>
     {% csrf_token %}
@@ -108,4 +109,5 @@
         $('#updateSubmissionsForm').submit();
     }
 </script>
+{% include 'partials/import_submission.html' %}
 {% endblock %}

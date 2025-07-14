@@ -1,0 +1,46 @@
+<div class="modal" id="importModalDialog" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Import Submission By ID</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="submissionId" class="form-label">Submission System ID</label>
+                <input type="text" class="form-control" id="submissionId" placeholder="Enter the 12 character submission system ID">
+              </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary"  onclick="importSubmission()">Import</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+    var importModal = null;
+    $(document).ready(function () {
+        importModal = new bootstrap.Modal(document.getElementById('importModalDialog'), {});
+    });
+    function openSubmissionModal() {
+        importModal.show();
+    }
+    function importSubmission () {
+        const submissionId = $('#submissionId').val();
+        if (!submissionId || submissionId.length != 12) {
+            alert('Please enter the 12 character submission ID')
+        } else {
+            axios.post('/api/submissions/import_submission/', { id: submissionId}, axios_headers)
+                .then( response => {
+                    console.log('response', response);
+                    importModal.hide();
+                    window.location = '/submissions/' + submissionId + '/'
+                })
+                .catch( error => {
+                    console.log('error', error);
+                    alert("There was an error importing this ID.  Please ensure that the system ID is correct.")
+                });
+        }
+    }
+</script>  
