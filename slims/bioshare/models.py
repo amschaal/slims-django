@@ -7,6 +7,7 @@ from django.utils import timezone
 class SubmissionShare(models.Model):
     ADMIN_PERMISSIONS = ["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]
     VIEWER_PERMISSIONS = ["view_share_files","download_share_files"]
+    SHARER_PERMISSIONS = ["view_share_files","download_share_files","share_read_only"]
     id = models.CharField(max_length=30, primary_key=True)
     submission = models.OneToOneField(Submission, on_delete=models.RESTRICT, related_name='share') # Fix char sets or run: alter table bioshare_submissionshare convert to character set latin1;
     name = models.CharField(max_length=50)
@@ -75,8 +76,11 @@ class SubmissionShare(models.Model):
             emails += [c['email'] for c in self.contacts]
         return [e.lower() for e in emails]
     def share(self, contacts=True, email=False):
-        emails = self.get_client_emails(contacts=contacts)
-        perms = {"groups": {}, "users":dict([(email,self.VIEWER_PERMISSIONS) for email in emails]), "email":email}
+        emails = self.get_client_emails(contacts=False)
+        client_perms = dict([(email,self.SHARER_PERMISSIONS) for email in emails])
+        for c in self.contacts:
+            client_perms[c['email']] = self.VIEWER_PERMISSIONS
+        perms = {"groups": {}, "users":client_perms, "email":email}
         return self.set_permissions(perms)
     def update_permissions(self):
         self.permissions = self.get_permissions()
