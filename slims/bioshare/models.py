@@ -5,7 +5,7 @@ from .requests import bioshare_post, bioshare_get, create_share, link_data
 from django.utils import timezone
 
 class SubmissionShare(models.Model):
-    ADMIN_PERMISSIONS = ["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]
+    ADMIN_PERMISSIONS = ["view_share_files","download_share_files","write_to_share","delete_share_files","share_read_only","admin"]
     VIEWER_PERMISSIONS = ["view_share_files","download_share_files"]
     SHARER_PERMISSIONS = ["view_share_files","download_share_files","share_read_only"]
     id = models.CharField(max_length=30, primary_key=True)
@@ -68,7 +68,7 @@ class SubmissionShare(models.Model):
     def share_with_group_and_participants(self, email=False):
         perms = {"users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.participants]), "email":email}
         if DEFAULT_GROUP:
-            perms["groups"] = {DEFAULT_GROUP: self.VIEWER_PERMISSIONS}
+            perms["groups"] = {DEFAULT_GROUP: self.SHARER_PERMISSIONS}
         return self.set_permissions(perms)
     def get_client_emails(self, contacts=True):
         emails = [self.submission.submitter_email, self.submission.pi_email]
