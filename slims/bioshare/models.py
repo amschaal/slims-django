@@ -59,7 +59,7 @@ class SubmissionShare(models.Model):
         self.updated = timezone.now()
         self.save(update_fields=['permissions', 'updated'])
     def share_with_participants(self, email=False):
-        perms = {"groups": {}, "users":dict([(p.email, self.ADMIN_PERMISSIONS) for p in self.participants]), "email":email}
+        perms = {"groups": {}, "users":dict([(p['email'], self.ADMIN_PERMISSIONS) for p in self.participants]), "email":email}
         return self.set_permissions(perms)
     def share_with_group(self, email=False):
         if DEFAULT_GROUP:
