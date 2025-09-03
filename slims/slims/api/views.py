@@ -137,7 +137,10 @@ class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
     def share_with_clients(self, request, pk=None):
         share = self.get_object()
         share.share(email=settings.BIOSHARE_EMAIL_CLIENT)
-        share.submission.link_share()
+        try:
+            share.submission.link_share()
+        except:
+            pass # should handle and report this eventually...
         return Response(BioshareSerializer(share).data)
     @action(detail=True, methods=['post'])
     def share_with_participants(self, request, pk=None):

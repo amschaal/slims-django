@@ -89,7 +89,9 @@
                 users.push({name: `${c.last_name}, ${c.first_name}`, email: c.email.toLowerCase(), source: 'Contacts'})
             });
             users.forEach(u => {
-                u.permissions = this.share.permissions.user_perms[u.email.toLowerCase()]
+                if (this.share.permissions && this.share.permissions.user_perms) {
+                    u.permissions = this.share.permissions.user_perms[u.email.toLowerCase()]
+                }
             })
             return users
         },
