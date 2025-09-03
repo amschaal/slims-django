@@ -42,7 +42,7 @@ class SubmissionShare(models.Model):
         return VIEW_URL.format(id=self.bioshare_id)
     @property
     def participants(self):
-        return self.submission.data.get('participants', [])
+        return [ p.get('user', p) for p in self.submission.data.get('participants', []) ]
     @property
     def contacts(self):
         return self.submission.data.get('contacts', [])

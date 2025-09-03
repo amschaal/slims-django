@@ -140,6 +140,16 @@ class BioshareViewSet(viewsets.ReadOnlyModelViewSet):
         share.submission.link_share()
         return Response(BioshareSerializer(share).data)
     @action(detail=True, methods=['post'])
+    def share_with_participants(self, request, pk=None):
+        share = self.get_object()
+        share.share_with_participants(email=settings.BIOSHARE_EMAIL_CLIENT)
+        return Response(BioshareSerializer(share).data)
+    @action(detail=True, methods=['post'])
+    def share_with_group(self, request, pk=None):
+        share = self.get_object()
+        share.share_with_group(email=settings.BIOSHARE_EMAIL_CLIENT)
+        return Response(BioshareSerializer(share).data)
+    @action(detail=True, methods=['post'])
     def update_share(self, request, pk=None):
         share = self.get_object()
         share.update_share()
