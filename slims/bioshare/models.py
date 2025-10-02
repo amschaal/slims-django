@@ -51,7 +51,7 @@ class SubmissionShare(models.Model):
 #             perms = {"test": True, "groups": {}, "users":dict([(p.email,["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]) for p in self.submission.participants.all()]), "email":True}
 #         print('perms', perms)
 #       perms = {"users":{"jdoe@domain.com":["view_share_files","download_share_files","write_to_share","delete_share_files","admin"]},"groups":{"1":["view_share_files","download_share_files","write_to_share"]},"email":true}
-        perms = bioshare_post(SET_PERMISSIONS_URL.format(id=self.bioshare_id), perms)
+        perms = bioshare_post(SET_PERMISSIONS_URL.format(id=self.bioshare_id), {'json': perms}) # @todo: fix the formatting when Bioshare has gotten rid of "json" as a base property 
         if not self.permissions:
             self.permissions = {}
         self.permissions['user_perms'] = perms['user_perms']
