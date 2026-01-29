@@ -81,7 +81,7 @@ class MiSeqRun(RunTypeBase):
 class NextSeqRun(RunTypeBase):
     id = 'NextSeq'
     name = 'NextSeq Run'
-    _data_directory_templates = [{'data_id': 'LANE_DIR','data_path': '/share/illumina/nextseq/{run.run_dir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
+    _data_directory_templates = [{'data_id': 'LANE_DIR','data_path': '{run.machine.base_directory}/{run.run_dir}/Unaligned/Project_{lane.lane_dir}/', 'repository_subpath': '{run.run_dir}'}] # May need to be able to expand based on multiple Unaligned directories, ie: Unaligned2, etc
 
 class NovaSeqRun(RunTypeBase):
     id = 'NovaSeq'
